@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:path/path.dart';
-import 'package:plain_optional/plain_optional.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
@@ -17,8 +16,8 @@ class PubspecFile {
       _read().version.map((_) => Version.parse(_)).valueOr(() => Version.none);
 
   /// Writes the project version to pubspec.yaml
-  void writeVersion(Version version) => update(
-      (pubspec) => pubspec.copyWith(version: Optional(version.toString())));
+  void writeVersion(Version version) => update((pubspec) => pubspec.copyWith(
+      version: pubspec.version.map((_) => version.toString())));
 
   /// Updated pubspec.yaml in-place.
   void update(PubspecYaml Function(PubspecYaml pubspec) mutate) =>
