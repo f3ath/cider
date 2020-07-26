@@ -1,4 +1,4 @@
-# Cider (CI for Dart. Efficient Releases)
+# Cider (CI for Dart. Efficient Release)
 A command-line utility to automate package maintenance. Manipulates the changelog and pubspec.yaml.
 
 This tool assumes that the changelog:
