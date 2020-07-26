@@ -1,5 +1,5 @@
-# CIDER (CI for Dart. Efficient Releases)
-A command-line utility to automate package maintenance. It manipulates the changelog and pubspec.yaml.
+# Cider (CI for Dart. Efficient Releases)
+A command-line utility to automate package maintenance. Manipulates the changelog and pubspec.yaml.
 
 This tool assumes that the changelog:
  - is called `CHANGELOG.md`
@@ -13,9 +13,17 @@ It also assumes that your project follows [Semantic Versioning v2.0.0](https://s
 ```
 pub global activate cider
 ```
+## Configure
+The config file name is `.cider.yaml`. It should reside in the root folder of the project. This file is optional. 
+So far it consists of just a single entry.
+```yaml
+changelog:
+  diff_link_template: 'https://github.com/org/project/compare/%from%...%to%'
+```
 
+The `%from%` and `%to%` placeholders will be replaced with the corresponding version tags.
 ## Usage
-### Logging changes to CHANGELOG
+### Logging changes to the changelog
 This command will add a new line to the `Unreleased` section of the changelog
 ```
 cider log <type> <description>
@@ -75,12 +83,14 @@ cider release
 
 Use `--date` to provide the release date (the default is today).
 
+Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
+
 ### Printing the current project version
 ```
 cider version
 ```
 
-### Printing the list of changes in a given version
+### Printing the list of changes in the given version
 ```
 cider print <version>
 ```

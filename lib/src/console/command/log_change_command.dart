@@ -22,7 +22,7 @@ class LogChangeCommand extends ApplicationCommand {
   int run() {
     if (argResults.rest.isEmpty) {
       _console.error('Please specify the change description');
-      return ExitCode.missingArgument;
+      return ExitCode.usageException;
     }
     final app = createApp();
     app.logChange(_type, argResults.rest.first);
