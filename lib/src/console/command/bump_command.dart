@@ -31,7 +31,7 @@ class BumpCommand extends ApplicationCommand {
     final app = createApp();
     final keepBuild = argResults['keep-build'];
     try {
-      final updated= app.bump(keepBuild ? KeepBuild(mutation) : mutation);
+      final updated = app.bump(keepBuild ? KeepBuild(mutation) : mutation);
       if (argResults['print']) _console.log(updated);
 //      app.release(
 //          keepBuild ? KeepBuild(mutation) : mutation, argResults['date']);
