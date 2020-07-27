@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:change/model.dart';
+import 'package:change/change.dart';
 import 'package:path/path.dart';
 
 class ChangelogFile {

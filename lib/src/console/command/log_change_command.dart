@@ -1,4 +1,4 @@
-import 'package:change/model.dart';
+import 'package:change/change.dart';
 import 'package:cider/cider.dart';
 import 'package:cider/src/console/command/application_command.dart';
 import 'package:cider/src/console/console.dart';

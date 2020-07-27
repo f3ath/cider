@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:change/model.dart';
+import 'package:change/change.dart';
 import 'package:cider/cider.dart';
 import 'package:cider/src/console/command/bump_command.dart';
 import 'package:cider/src/console/command/describe_command.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:change/model.dart';
+import 'package:change/change.dart';
 import 'package:cider/src/application_exception.dart';
 import 'package:cider/src/changelog_file.dart';
 import 'package:cider/src/config.dart';
@@ -23,7 +23,7 @@ class Application {
 
   void logChange(ChangeType type, String text) =>
       _changelogFile.update((changelog) {
-        changelog.unreleased.changes.addText(type, text);
+        changelog.unreleased.section(type).add(text);
         return changelog;
       });
 
