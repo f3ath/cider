@@ -1,3 +1,4 @@
+![logo]
 # Cider (CI for Dart. Efficient Release)
 A command-line utility to automate package maintenance. Manipulates the changelog and pubspec.yaml.
 
@@ -94,3 +95,5 @@ cider version
 cider describe <version>
 ```
 - **version** is an existing version from the changelog
+
+[logo]: https://raw.githubusercontent.com/f3ath/cider/master/cider.png

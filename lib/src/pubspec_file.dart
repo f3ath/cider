@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 class PubspecFile {
   PubspecFile(this._dir);
@@ -12,21 +11,48 @@ class PubspecFile {
   final String _dir;
 
   /// Reads the project version from pubspec.yaml
-  Version readVersion() =>
-      _read().version.map((_) => Version.parse(_)).valueOr(() => Version.none);
+  Version readVersion() => Version.parse(_findVersion(_readLines()));
 
   /// Writes the project version to pubspec.yaml
-  void writeVersion(Version version) => update((pubspec) => pubspec.copyWith(
-      version: pubspec.version.map((_) => version.toString())));
+  void writeVersion(Version version) => _file.writeAsStringSync(
+      _setVersion(_readLines(), version.toString()).join('\n'));
 
-  /// Updated pubspec.yaml in-place.
-  void update(PubspecYaml Function(PubspecYaml pubspec) mutate) =>
-      _write(mutate(_read()));
+  List<String> _readLines() => _file.readAsLinesSync();
+  final regex = RegExp(
+      r'''^(?<prefix>version\:\s+)(?<quote>['"]?)(?<version>[a-z-A-Z0-9\.+-]+)\2(?<suffix>.*)?$''');
 
-  void _write(PubspecYaml pubspecYaml) =>
-      _file.writeAsStringSync(pubspecYaml.toYamlString());
+  String _findVersion(List<String> lines) {
+    final candidates = lines
+        .map(regex.firstMatch)
+        .where((match) => match != null)
+        .map((match) => match.namedGroup('version'))
+        .toList();
+    if (candidates.length == 1) return candidates.single;
+    throw Exception('Can not reliably determine the version');
+  }
 
-  PubspecYaml _read() => _file.readAsStringSync().toPubspecYaml();
+  List<String> _setVersion(List<String> lines, String version) {
+    var isReplaced = false;
+    final updated = lines.map((line) {
+      final match = regex.firstMatch(line);
+      if (match != null) {
+        if (isReplaced) {
+          throw Exception('Can not reliably update the version');
+        }
+        isReplaced = true;
+        return [
+          match.namedGroup('prefix'),
+          match.namedGroup('quote') ?? '',
+          version,
+          match.namedGroup('quote') ?? '',
+          match.namedGroup('suffix') ?? ''
+        ].join();
+      }
+      return line;
+    }).toList();
+    if (isReplaced) return updated;
+    throw Exception('Can not find the version');
+  }
 
   File get _file => File(join(_dir, name));
 }

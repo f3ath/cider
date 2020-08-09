@@ -6,9 +6,6 @@ import 'package:version_manipulation/mutations.dart';
 class BumpCommand extends ApplicationCommand {
   BumpCommand(this.name, this.mutation, this._console) {
     argParser
-//      ..addOption('date',
-//          help: 'Release date',
-//          defaultsTo: DateFormat('y-MM-dd').format(DateTime.now()))
       ..addFlag('print',
           help: 'Prints the updated version', abbr: 'p', defaultsTo: false)
       ..addFlag('keep-build',
@@ -33,8 +30,6 @@ class BumpCommand extends ApplicationCommand {
     try {
       final updated = app.bump(keepBuild ? KeepBuild(mutation) : mutation);
       if (argResults['print']) _console.log(updated);
-//      app.release(
-//          keepBuild ? KeepBuild(mutation) : mutation, argResults['date']);
       return ExitCode.ok;
     } catch (e) {
       _console.error(e);
