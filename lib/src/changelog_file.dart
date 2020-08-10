@@ -6,16 +6,16 @@ import 'package:path/path.dart';
 class ChangelogFile {
   ChangelogFile(this._dir);
 
-  static final name = 'CHANGELOG.md';
+  static const name = 'CHANGELOG.md';
 
   final String _dir;
 
   /// Updates the changelog in-place
   void update(Changelog Function(Changelog changelog) mutate) =>
-      _write(mutate(read()));
+      _write(mutate(_read()));
 
   /// Reads the changelog from file
-  Changelog read() => Changelog.fromLines(
+  Changelog _read() => Changelog.fromLines(
       (_file..createSync(recursive: true)).readAsLinesSync());
 
   void _write(Changelog changelog) => _file.writeAsStringSync(changelog.dump());

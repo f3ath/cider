@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:cider/src/changelog_file.dart';
 import 'package:cider/src/console/console_application.dart';
-import 'package:cider/src/pubspec_file.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -18,8 +16,8 @@ void main() {
 
   setUp(() async {
     temp = await Directory.systemTemp.createTemp();
-    changelogPath = join(temp.path, ChangelogFile.name);
-    pubspecPath = join(temp.path, PubspecFile.name);
+    changelogPath = join(temp.path, 'CHANGELOG.md');
+    pubspecPath = join(temp.path, 'pubspec.yaml');
 
     console = MockConsole();
     app = ConsoleApplication('ci', console: console);
@@ -56,29 +54,16 @@ void main() {
   group('Bump', () {
     test('minor', () async {
       await File('test/samples/pubspec-1.0.0.yaml').copy(pubspecPath);
-      expect(
-          await app.run([
-            'bump',
-            'minor',
-            '--project-root',
-            temp.path
-          ]),
-          0);
-      expect(File(pubspecPath).readAsStringSync().trim(),
-          File('test/samples/pubspec-1.1.0.yaml').readAsStringSync().trim());
+      expect(await app.run(['bump', 'minor', '--project-root', temp.path]), 0);
+      expect(File(pubspecPath).readAsStringSync(),
+          File('test/samples/pubspec-1.1.0.yaml').readAsStringSync());
     });
 
     test('patch, keeping build, printing version', () async {
       await File('test/samples/pubspec-1.0.0-beta.yaml').copy(pubspecPath);
       expect(
-          await app.run([
-            'bump',
-            'patch',
-            '-b',
-            '-p',
-            '--project-root',
-            temp.path
-          ]),
+          await app
+              .run(['bump', 'patch', '-b', '-p', '--project-root', temp.path]),
           0);
       expect(
           File(pubspecPath).readAsStringSync().trim(),
@@ -96,13 +81,8 @@ void main() {
       await File('test/samples/.cider.yaml')
           .copy(join(temp.path, '.cider.yaml'));
       expect(
-          await app.run([
-            'release',
-            '--date',
-            '2018-10-18',
-            '--project-root',
-            temp.path
-          ]),
+          await app.run(
+              ['release', '--date', '2018-10-18', '--project-root', temp.path]),
           0);
       expect(File(changelogPath).readAsStringSync(),
           File('test/samples/step3.md').readAsStringSync());
@@ -113,13 +93,7 @@ void main() {
       await File('test/samples/pubspec-1.0.0.yaml').copy(pubspecPath);
       await File('test/samples/.cider.yaml')
           .copy(join(temp.path, '.cider.yaml'));
-      expect(
-          await app.run([
-            'release',
-            '--project-root',
-            temp.path
-          ]),
-          64);
+      expect(await app.run(['release', '--project-root', temp.path]), 64);
       expect(File(changelogPath).readAsStringSync(),
           File('test/samples/step2.md').readAsStringSync());
     });
@@ -154,7 +128,8 @@ void main() {
     test('provided', () async {
       await File('test/samples/step3.md').copy(changelogPath);
       await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      expect(await app.run(['describe', '1.0.0', '--project-root', temp.path]), 0);
+      expect(
+          await app.run(['describe', '1.0.0', '--project-root', temp.path]), 0);
       expect(console.logs.single, '''## 1.0.0 - 2018-10-15
 ### Added
 - Initial version of the example''');
