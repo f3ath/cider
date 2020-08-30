@@ -16,8 +16,8 @@ class Console {
 
   /// Writes the [message] to the error sink
   void error(Object message) => _supportsAnsiEscapes
-    ? _error.writeln('\x1B[31m${message.toString()}\x1B[0m')
-    : _error.writeln(message.toString());
+      ? _error.writeln('\x1B[31m${message.toString()}\x1B[0m')
+      : _error.writeln(message.toString());
 
   /// Writes the [message] the to the normal output sink
   void log(Object message) => _output.writeln(message.toString());
