@@ -38,6 +38,17 @@ cider log add 'Support for rocket fuel and kerosene'
 cider log fix 'No more wheels falling off'
 ```
 
+## Setting the project version
+```
+cider set <version>
+```
+- **version** must be in the correct format
+
+Version before | Command | Version after
+--- | --- | ---
+1.2.3 | `cider set 3.2.1`  | 3.2.1
+0.2.1 | `cider set 0.0.1-dev`  | 0.0.1-dev
+
 ## Bumping the project version
 ```
 cider bump <version>
