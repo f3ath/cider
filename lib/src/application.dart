@@ -56,6 +56,11 @@ class Application {
   /// Reads the current project version from pubspec.yaml
   String readVersion() => _readVersion().toString();
 
+  /// Sets the [version] to pubspec.yaml
+  void setVersion(String version) {
+    _writeVersion(Version.parse(version));
+  }
+
   /// Reads the markdown description for the given release
   String describe([String version]) {
     final changelog = _readChangelog();
@@ -86,4 +91,5 @@ class Application {
   void _writeChangelog(Changelog changelog) =>
       (_changelog..createSync(recursive: true))
           .writeAsStringSync(changelog.dump());
+
 }

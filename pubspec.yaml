@@ -14,7 +14,7 @@ dependencies:
   maybe_just_nothing: ^0.3.0
   path: ^1.6.0
   pub_semver: ^1.4.4
-  version_manipulation: ^0.0.2
+  version_manipulation: ^0.0.4
   yaml: ^2.2.1
   yaml_edit: ^1.0.0
 

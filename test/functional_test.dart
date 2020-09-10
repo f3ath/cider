@@ -59,18 +59,27 @@ void main() {
           File('test/samples/pubspec-1.1.0.yaml').readAsStringSync());
     });
 
-    test('patch, keeping build, printing version', () async {
-      await File('test/samples/pubspec-1.0.0-beta.yaml').copy(pubspecPath);
+    test('patch, keeping build, printing new version', () async {
+      await File('test/samples/pubspec-1.0.0+beta.yaml').copy(pubspecPath);
       expect(
           await app
               .run(['bump', 'patch', '-b', '-p', '--project-root', temp.path]),
           0);
       expect(
           File(pubspecPath).readAsStringSync().trim(),
-          File('test/samples/pubspec-1.0.1-beta.yaml')
+          File('test/samples/pubspec-1.0.1+beta.yaml')
               .readAsStringSync()
               .trim());
       expect(console.logs.single, '1.0.1+beta');
+    });
+
+    test('patch, keeping pre-release tag and build, printing new version',
+        () async {
+      await File('test/samples/pubspec-1.1.0-alpha+42.yaml').copy(pubspecPath);
+      expect(
+          await app.run(['bump', 'patch', '-brp', '--project-root', temp.path]),
+          0);
+      expect(console.logs.single, '1.1.1-alpha+42');
     });
   });
 
@@ -103,6 +112,23 @@ void main() {
     test('Print', () async {
       await File('test/samples/step3.md').copy(changelogPath);
       await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
+      expect(await app.run(['version', '--project-root', temp.path]), 0);
+      expect(console.logs.single, '1.1.0');
+    });
+    test('Set successfully', () async {
+      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
+      expect(
+          await app.run(['--project-root', temp.path, 'version', '1.2.3-beta']),
+          0);
+      expect(console.logs.single, '1.2.3-beta');
+      expect(await app.run(['version', '--project-root', temp.path]), 0);
+      expect(console.logs[1], '1.2.3-beta');
+    });
+    test('Set errors out', () async {
+      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
+      expect(
+          await app.run(['--project-root', temp.path, 'version', 'foo']), 64);
+      expect(console.errors.single, 'Invalid version "foo".');
       expect(await app.run(['version', '--project-root', temp.path]), 0);
       expect(console.logs.single, '1.1.0');
     });

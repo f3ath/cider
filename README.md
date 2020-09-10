@@ -28,6 +28,7 @@ changelog:
 ```
 
 The `%from%` and `%to%` placeholders will be replaced with the corresponding version tags.
+
 ## Updating the changelog
 This command will add a new line to the `Unreleased` section of the changelog
 ```
@@ -42,12 +43,23 @@ cider log change 'New turbo engine installed'
 cider log add 'Support for rocket fuel and kerosene'
 cider log fix 'No more wheels falling off'
 ```
+## Releasing the unreleased changes
+This command takes all changes from the `Unreleased` section on the changelog and creates a new release with the
+version from pubspec.yaml
+
+```
+cider release
+```
+
+Use `--date` to provide the release date (the default is today).
+
+Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
 
 ## Setting the project version
 ```
-cider set <version>
+cider version <new_version>
 ```
-- **version** must be in the correct format
+- **new_version** must be semver-compatible
 
 Version before | Command | Version after
 --- | --- | ---
@@ -89,17 +101,18 @@ Version before | Command | Version after
 0.2.1+42 | `cider bump patch`          | 0.2.2
 0.2.1+42 | `cider bump patch -b`       | 0.2.2+42
 
-## Releasing the unreleased changes
-This command takes all changes from the `Unreleased` section on the changelog and creates a new release with the
-version from pubspec.yaml
 
+## Setting the version explicitly
 ```
-cider release
+cider version <new_version>
 ```
+- **new_version** is any arbitrary version
 
-Use `--date` to provide the release date (the default is today).
-
-Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
+Examples
+```
+cider version 3.0.0
+cider version 1.2.0-nullsafety+42
+```
 
 ## Printing the current project version
 ```

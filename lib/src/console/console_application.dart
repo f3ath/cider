@@ -5,7 +5,6 @@ import 'package:cider/src/console/command/bump_command.dart';
 import 'package:cider/src/console/command/describe_command.dart';
 import 'package:cider/src/console/command/log_change_command.dart';
 import 'package:cider/src/console/command/release_command.dart';
-import 'package:cider/src/console/command/set_command.dart';
 import 'package:cider/src/console/command/version_command.dart';
 import 'package:cider/src/console/command/wrapper.dart';
 import 'package:cider/src/console/console.dart';
@@ -68,6 +67,5 @@ class ConsoleApplication extends CommandRunner<int> {
     addCommand(VersionCommand(console));
     addCommand(DescribeCommand(console));
     addCommand(ReleaseCommand(console));
-    addCommand(SetCommand(console));
   }
 }
