@@ -86,5 +86,4 @@ class Application {
   void _writeChangelog(Changelog changelog) =>
       (_changelog..createSync(recursive: true))
           .writeAsStringSync(changelog.dump());
-
 }
