@@ -1,10 +1,5 @@
 ![logo]  
 # Cider (CI for Dart. Efficient Release)
-[![Actions Status](https://github.com/f3ath/cider/workflows/Dart%20CI/badge.svg)](https://github.com/f3ath/cider/actions)
-[![Coverage](https://codecov.io/gh/f3ath/cider/branch/master/graph/badge.svg)](https://codecov.io/gh/f3ath/cider)
-[![Pub](https://img.shields.io/pub/v/cider.svg)](https://pub.dev/packages/cider)
-[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
-[![pedantic](https://dart-lang.github.io/linter/lints/style-pedantic.svg)](https://medium.com/dartlang/pedantic-dart-1c7d365510de)  
 A command-line utility to automate package maintenance. Manipulates the changelog and pubspec.yaml.
 
 This tool assumes that the changelog:
@@ -73,6 +68,7 @@ cider bump <version>
 - **version** can be any of: `breaking`, `major`, `minor`, `patch`, `build`
 
 Use `--keep-build` or `-b` to retain the build part of the version.
+Use `--keep-pre-release` or `-r` to retain the pre-release part of the version.
 
 Use `--print` or `-p` to print the new version.
 

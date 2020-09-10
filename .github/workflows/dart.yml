@@ -23,7 +23,7 @@ jobs:
       - name: Format
         run: dartfmt --dry-run --set-exit-if-changed lib
       - name: Run tests
-        run: pub run test_coverage --no-badge --print-test-output --min-coverage 100
+        run: pub run test_coverage --no-badge --print-test-output --min-coverage 90
       #- name: Upload coverage to Codecov
       #  uses: codecov/codecov-action@v1
       #  with:

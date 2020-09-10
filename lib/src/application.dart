@@ -48,11 +48,6 @@ class Application {
     _writeChangelog(changelog);
   }
 
-  String set(Version version) {
-    _writeVersion(version);
-    return version.toString();
-  }
-
   /// Reads the current project version from pubspec.yaml
   String readVersion() => _readVersion().toString();
 
