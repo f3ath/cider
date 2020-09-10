@@ -19,3 +19,8 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+
+# test_coverage
+test/.test_coverage.dart
+coverage
+coverage_badge.svg
