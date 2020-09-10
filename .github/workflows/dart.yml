@@ -2,9 +2,9 @@ name: Dart CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 jobs:
   build:
@@ -20,5 +20,17 @@ jobs:
         run: pub get
       - name: Analyzer
         run: dartanalyzer lib test --fatal-infos --fatal-warnings
-      - name: Tests
-        run: pub run test
+      - name: Format
+        run: dartfmt --dry-run --set-exit-if-changed lib
+      - name: Run tests
+        run: pub run test_coverage --no-badge --print-test-output --min-coverage 90
+      #- name: Upload coverage to Codecov
+      #  uses: codecov/codecov-action@v1
+      #  with:
+      #    token: ${{ secrets.CODECOV_TOKEN }}
+      #- name: Check Code Coverage
+      #  uses: ChicagoFlutter/lcov-cop@v1.0.2
+      #  with:
+      #    path: coverage/lcov.info
+      #    min_coverage: 100
+      #    exclude: "**/*.g.dart"

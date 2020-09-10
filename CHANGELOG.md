@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.0.5] - 2020-09-09
+### Added
+- Setting version explicitly
+- Ability to retain pre-release part of the version
+
 ## [0.0.4] - 2020-08-10
 ### Changed
 - Using a yaml manipulation library to updatd pubspec.yaml. This expected to be more reliable than a regexp.
@@ -44,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial version
 
-[Unreleased]: https://github.com/f3ath/cider/compare/0.0.4...HEAD
+[Unreleased]: https://github.com/f3ath/cider/compare/0.0.5...HEAD
+[0.0.5]: https://github.com/f3ath/cider/compare/0.0.4...0.0.5
 [0.0.4]: https://github.com/f3ath/cider/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/f3ath/cider/compare/0.0.2+1...0.0.3
 [0.0.2+1]: https://github.com/f3ath/cider/compare/0.0.2...0.0.2+1

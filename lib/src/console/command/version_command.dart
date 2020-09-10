@@ -18,6 +18,24 @@ class VersionCommand extends ApplicationCommand {
 
   @override
   int run() {
+    if (argResults.rest.isEmpty) {
+      return _readVersion();
+    }
+    return _setVersion(argResults.rest.first);
+  }
+
+  int _setVersion(String version) {
+    try {
+      createApp().setVersion(version);
+    } on FormatException {
+      _console.error('Invalid version "$version".');
+      return ExitCode.applicationError;
+    }
+    _console.log(version);
+    return ExitCode.ok;
+  }
+
+  int _readVersion() {
     _console.log(createApp().readVersion());
     return ExitCode.ok;
   }

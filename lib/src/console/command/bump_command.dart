@@ -11,6 +11,10 @@ class BumpCommand extends ApplicationCommand {
       ..addFlag('keep-build',
           help: 'Keeps the build part of the version',
           abbr: 'b',
+          defaultsTo: false)
+      ..addFlag('keep-pre-release',
+          help: 'Keeps the pre-release part of the version',
+          abbr: 'r',
           defaultsTo: false);
   }
 
@@ -25,15 +29,20 @@ class BumpCommand extends ApplicationCommand {
 
   @override
   int run() {
-    final app = createApp();
-    final keepBuild = argResults['keep-build'];
     try {
-      final updated = app.bump(keepBuild ? KeepBuild(mutation) : mutation);
+      final updated = createApp().bump(_adjustedMutation);
       if (argResults['print']) _console.log(updated);
       return ExitCode.ok;
     } catch (e) {
       _console.error(e);
       return ExitCode.applicationError;
     }
+  }
+
+  VersionMutation get _adjustedMutation {
+    var m = mutation;
+    if (argResults['keep-pre-release']) m = KeepPreRelease(m);
+    if (argResults['keep-build']) m = KeepBuild(m);
+    return m;
   }
 }

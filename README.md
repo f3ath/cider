@@ -1,4 +1,4 @@
-![logo]
+![logo]  
 # Cider (CI for Dart. Efficient Release)
 A command-line utility to automate package maintenance. Manipulates the changelog and pubspec.yaml.
 
@@ -23,6 +23,7 @@ changelog:
 ```
 
 The `%from%` and `%to%` placeholders will be replaced with the corresponding version tags.
+
 ## Updating the changelog
 This command will add a new line to the `Unreleased` section of the changelog
 ```
@@ -37,6 +38,28 @@ cider log change 'New turbo engine installed'
 cider log add 'Support for rocket fuel and kerosene'
 cider log fix 'No more wheels falling off'
 ```
+## Releasing the unreleased changes
+This command takes all changes from the `Unreleased` section on the changelog and creates a new release with the
+version from pubspec.yaml
+
+```
+cider release
+```
+
+Use `--date` to provide the release date (the default is today).
+
+Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
+
+## Setting the project version
+```
+cider version <new_version>
+```
+- **new_version** must be semver-compatible
+
+Version before | Command | Version after
+--- | --- | ---
+1.2.3 | `cider set 3.2.1`  | 3.2.1
+0.2.1 | `cider set 0.0.1-dev`  | 0.0.1-dev
 
 ## Bumping the project version
 ```
@@ -45,6 +68,7 @@ cider bump <version>
 - **version** can be any of: `breaking`, `major`, `minor`, `patch`, `build`
 
 Use `--keep-build` or `-b` to retain the build part of the version.
+Use `--keep-pre-release` or `-r` to retain the pre-release part of the version.
 
 Use `--print` or `-p` to print the new version.
 
@@ -73,17 +97,18 @@ Version before | Command | Version after
 0.2.1+42 | `cider bump patch`          | 0.2.2
 0.2.1+42 | `cider bump patch -b`       | 0.2.2+42
 
-## Releasing the unreleased changes
-This command takes all changes from the `Unreleased` section on the changelog and creates a new release with the
-version from pubspec.yaml
 
+## Setting the version explicitly
 ```
-cider release
+cider version <new_version>
 ```
+- **new_version** is any arbitrary version
 
-Use `--date` to provide the release date (the default is today).
-
-Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
+Examples
+```
+cider version 3.0.0
+cider version 1.2.0-nullsafety+42
+```
 
 ## Printing the current project version
 ```
