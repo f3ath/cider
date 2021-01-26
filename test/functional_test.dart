@@ -122,7 +122,7 @@ void main() {
           0);
       expect(console.logs.single, '1.2.3-beta');
       expect(await app.run(['version', '--project-root', temp.path]), 0);
-      expect(console.logs[1], '1.2.3-beta');
+      expect(console.logs[1], '1.2.3');
     });
     test('Set errors out', () async {
       await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
