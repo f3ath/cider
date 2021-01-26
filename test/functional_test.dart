@@ -118,11 +118,11 @@ void main() {
     test('Set successfully', () async {
       await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
       expect(
-          await app.run(['--project-root', temp.path, 'version', '1.2.3']), 0);
+          await app.run(['--project-root', temp.path, 'version', '1.2.3-beta']),
+          0);
       expect(console.logs.single, '1.2.3-beta');
-
       expect(await app.run(['version', '--project-root', temp.path]), 0);
-      expect(console.logs[1], '1.2.3');
+      expect(console.logs[1], '1.2.3-beta');
     });
     test('Set errors out', () async {
       await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
