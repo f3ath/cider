@@ -24,3 +24,7 @@ doc/api/
 test/.test_coverage.dart
 coverage
 coverage_badge.svg
+
+
+# Android Studi
+.idea/*
