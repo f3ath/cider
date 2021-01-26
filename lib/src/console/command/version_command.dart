@@ -26,7 +26,7 @@ class VersionCommand extends ApplicationCommand {
 
   int _setVersion(String version) {
     try {
-      var aStr = version.replaceAll(RegExp(r'[^0-9.]'),'');
+      var aStr = version.replaceAll(RegExp(r'[^0-9.]'), '');
       createApp().setVersion(aStr);
     } on FormatException {
       _console.error('Invalid version "$version".');
