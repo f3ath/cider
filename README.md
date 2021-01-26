@@ -14,6 +14,7 @@ It also assumes that your project follows [Semantic Versioning v2.0.0](https://s
 ```
 pub global activate cider
 ```
+
 ## Configure
 The config file name is `.cider.yaml`. It should reside in the root folder of the project. This file is optional. 
 So far it consists of just a single entry.
@@ -38,6 +39,7 @@ cider log change 'New turbo engine installed'
 cider log add 'Support for rocket fuel and kerosene'
 cider log fix 'No more wheels falling off'
 ```
+
 ## Releasing the unreleased changes
 This command takes all changes from the `Unreleased` section on the changelog and creates a new release with the
 version from pubspec.yaml
@@ -50,8 +52,10 @@ Use `--date` to provide the release date (the default is today).
 
 Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
 
+
 ## Setting the project version
 ```
+cider set <new_version>
 cider version <new_version>
 ```
 - **new_version** must be semver-compatible
@@ -60,6 +64,11 @@ Version before | Command | Version after
 --- | --- | ---
 1.2.3 | `cider set 3.2.1`  | 3.2.1
 0.2.1 | `cider set 0.0.1-dev`  | 0.0.1-dev
+--- | --- | ---
+1.2.3 | `cider version 3.2.1`  | 3.2.1
+0.2.1 | `cider version test/0.0.1-dev`  | 0.0.1
+
+
 
 ## Bumping the project version
 ```
@@ -96,19 +105,6 @@ Version before | Command | Version after
 0.2.1+42 | `cider bump breaking -b`    | 0.3.0+42
 0.2.1+42 | `cider bump patch`          | 0.2.2
 0.2.1+42 | `cider bump patch -b`       | 0.2.2+42
-
-
-## Setting the version explicitly
-```
-cider version <new_version>
-```
-- **new_version** is any arbitrary version
-
-Examples
-```
-cider version 3.0.0
-cider version 1.2.0-nullsafety+42
-```
 
 ## Printing the current project version
 ```
