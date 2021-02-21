@@ -58,8 +58,8 @@ cider version <new_version>
 
 Version before | Command | Version after
 --- | --- | ---
-1.2.3 | `cider set 3.2.1`  | 3.2.1
-0.2.1 | `cider set 0.0.1-dev`  | 0.0.1-dev
+1.2.3 | `cider version 3.2.1`  | 3.2.1
+0.2.1 | `cider version 0.0.1-dev`  | 0.0.1-dev
 
 ## Bumping the project version
 ```
