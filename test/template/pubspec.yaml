@@ -1,0 +1,8 @@
+name: test
+version: 0.0.5-alpha+42
+description: Test project
+
+cider:
+  link_template:
+    diff: https://github.com/example/project/compare/%from%...%to%
+    tag: https://github.com/example/project/releases/tag/%tag%

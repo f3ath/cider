@@ -1,164 +1,139 @@
 import 'dart:io';
 
-import 'package:args/command_runner.dart';
-import 'package:cider/src/console/console_application.dart';
+import 'package:cider/cider.dart';
+import 'package:cider/testing.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
-import 'mock_console.dart';
-
 void main() {
-  Directory temp;
-  MockConsole console;
-  CommandRunner<int> app;
-  String changelogPath;
-  String pubspecPath;
-
+  late Directory temp;
+  late Cider cider;
+  late MockStdout out, err;
   setUp(() async {
     temp = await Directory.systemTemp.createTemp();
-    changelogPath = join(temp.path, 'CHANGELOG.md');
-    pubspecPath = join(temp.path, 'pubspec.yaml');
-
-    console = MockConsole();
-    app = ConsoleApplication('ci', console: console);
+    await Directory('test/template').list().forEach((element) {
+      if (element is File) {
+        element.copy(join(temp.path, basename(element.path)));
+      }
+    });
+    out = MockStdout();
+    err = MockStdout();
+    cider = Cider(root: temp);
+    cider.provide<Stdout>((_) => out);
+    cider.provide<Stdout>((_) => err, name: 'stderr');
   });
 
-  tearDown(() async {});
-
-  group('Changelog', () {
-    test('Add entries to the CHANGELOG', () async {
-      await File('test/samples/step1.md').copy(changelogPath);
-      expect(
-          await app.run([
-            'log',
-            'change',
-            'Programmatically added change',
-            '--project-root',
-            temp.path
-          ]),
-          0);
-      expect(
-          await app.run([
-            'log',
-            'd',
-            'Programmatically added deprecation',
-            '--project-root',
-            temp.path
-          ]),
-          0);
-      expect(File(changelogPath).readAsStringSync(),
-          File('test/samples/step2.md').readAsStringSync());
-    });
+  tearDown(() async {
+    await temp.delete(recursive: true);
   });
 
-  group('Bump', () {
-    test('minor', () async {
-      await File('test/samples/pubspec-1.0.0.yaml').copy(pubspecPath);
-      expect(await app.run(['bump', 'minor', '--project-root', temp.path]), 0);
-      expect(File(pubspecPath).readAsStringSync(),
-          File('test/samples/pubspec-1.1.0.yaml').readAsStringSync());
-    });
+  test('Full release cycle', () async {
+    final code = await cider.run(['log', 'add', 'Initial release']);
+    expect(code, 0);
+    await cider.run(['describe']);
+    final step1 = '''
+## Unreleased
+### Added
+- Initial release
+''';
+    expect(out.buffer.toString(), step1);
+    await cider.run(['version', '1.0.0']);
+    out.buffer.clear();
+    await cider.run(['release', '--date=2020-01-02']);
+    final step2 = '''
+## [1.0.0] - 2020-01-02
+### Added
+- Initial release
 
-    test('patch, keeping build, printing new version', () async {
-      await File('test/samples/pubspec-1.0.0+beta.yaml').copy(pubspecPath);
-      expect(
-          await app
-              .run(['bump', 'patch', '-b', '-p', '--project-root', temp.path]),
-          0);
-      expect(
-          File(pubspecPath).readAsStringSync().trim(),
-          File('test/samples/pubspec-1.0.1+beta.yaml')
-              .readAsStringSync()
-              .trim());
-      expect(console.logs.single, '1.0.1+beta');
-    });
+[1.0.0]: https://github.com/example/project/releases/tag/1.0.0
+''';
+    expect(out.buffer.toString(), step2);
+    out.buffer.clear();
+    await cider.run(['log', 'change', 'New turbo V6 engine installed']);
+    await cider.run(['log', 'fix', 'Wheels falling off sporadically']);
+    await cider.run(['describe']);
+    final step3 = '''
+## [Unreleased]
+### Changed
+- New turbo V6 engine installed
 
-    test('patch, keeping pre-release tag and build, printing new version',
-        () async {
-      await File('test/samples/pubspec-1.1.0-alpha+42.yaml').copy(pubspecPath);
-      expect(
-          await app.run(['bump', 'patch', '-brp', '--project-root', temp.path]),
-          0);
-      expect(console.logs.single, '1.1.1-alpha+42');
-    });
-  });
+### Fixed
+- Wheels falling off sporadically
 
-  group('Release', () {
-    test('successful', () async {
-      await File('test/samples/step2.md').copy(changelogPath);
-      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      await File('test/samples/.cider.yaml')
-          .copy(join(temp.path, '.cider.yaml'));
-      expect(
-          await app.run(
-              ['release', '--date', '2018-10-18', '--project-root', temp.path]),
-          0);
-      expect(File(changelogPath).readAsStringSync(),
-          File('test/samples/step3.md').readAsStringSync());
-    });
+[Unreleased]: https://github.com/example/project/compare/1.0.0...HEAD
+''';
+    expect(out.buffer.toString(), step3);
+    await cider.run(['bump', 'minor']);
+    out.buffer.clear();
+    await cider.run(['release', '--date=2021-02-03']);
+    final step4 = '''
+## [1.1.0] - 2021-02-03
+### Changed
+- New turbo V6 engine installed
 
-    test('existing version', () async {
-      await File('test/samples/step2.md').copy(changelogPath);
-      await File('test/samples/pubspec-1.0.0.yaml').copy(pubspecPath);
-      await File('test/samples/.cider.yaml')
-          .copy(join(temp.path, '.cider.yaml'));
-      expect(await app.run(['release', '--project-root', temp.path]), 64);
-      expect(File(changelogPath).readAsStringSync(),
-          File('test/samples/step2.md').readAsStringSync());
-    });
+### Fixed
+- Wheels falling off sporadically
+
+[1.1.0]: https://github.com/example/project/compare/1.0.0...1.1.0
+''';
+    expect(out.buffer.toString(), step4);
   });
 
   group('Version', () {
-    test('Print', () async {
-      await File('test/samples/step3.md').copy(changelogPath);
-      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      expect(await app.run(['version', '--project-root', temp.path]), 0);
-      expect(console.logs.single, '1.1.0');
-    });
-    test('Set successfully', () async {
-      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      expect(
-          await app.run(['--project-root', temp.path, 'version', '1.2.3-beta']),
-          0);
-      expect(console.logs.single, '1.2.3-beta');
-      expect(await app.run(['version', '--project-root', temp.path]), 0);
-      expect(console.logs[1], '1.2.3-beta');
-    });
-    test('Set errors out', () async {
-      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      expect(
-          await app.run(['--project-root', temp.path, 'version', 'foo']), 64);
-      expect(console.errors.single, 'Invalid version "foo".');
-      expect(await app.run(['version', '--project-root', temp.path]), 0);
-      expect(console.logs.single, '1.1.0');
-    });
-  });
-
-  group('Describe', () {
-    test('Latest', () async {
-      await File('test/samples/step3.md').copy(changelogPath);
-      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      expect(await app.run(['describe', '--project-root', temp.path]), 0);
-      expect(console.logs.single, '''## [1.1.0] - 2018-10-18
-### Changed
-- Change #1
-- Change #2
-- Programmatically added change
-
-### Deprecated
-- Programmatically added deprecation
-
-[1.1.0]: https://github.com/example/project/compare/1.0.0...1.1.0''');
+    test('get', () async {
+      final code = await cider.run(['version']);
+      expect(code, 0);
+      expect(out.buffer.toString().trim(), '0.0.5-alpha+42');
     });
 
-    test('provided', () async {
-      await File('test/samples/step3.md').copy(changelogPath);
-      await File('test/samples/pubspec-1.1.0.yaml').copy(pubspecPath);
-      expect(
-          await app.run(['describe', '1.0.0', '--project-root', temp.path]), 0);
-      expect(console.logs.single, '''## 1.0.0 - 2018-10-15
-### Added
-- Initial version of the example''');
+    test('set', () async {
+      final code = await cider.run(['version', '1.0.0']);
+      expect(code, 0);
+      expect(out.buffer.toString().trim(), '1.0.0');
+      out.buffer.clear();
+      await cider.run(['version']);
+      expect(out.buffer.toString().trim(), '1.0.0');
+    });
+
+    group('bump', () {
+      <List<String>, String>{
+        ['bump', 'breaking']: '0.1.0',
+        ['bump', 'breaking', '--keep-build']: '0.1.0+42',
+        ['bump', 'breaking', '--bump-build']: '0.1.0+43',
+        ['bump', 'breaking', '--build=foo']: '0.1.0+foo',
+        ['bump', 'breaking', '--pre=beta']: '0.1.0-beta',
+        ['bump', 'breaking', '--pre=beta', '--build=foo']: '0.1.0-beta+foo',
+        ['bump', 'major']: '1.0.0',
+        ['bump', 'major', '--keep-build']: '1.0.0+42',
+        ['bump', 'major', '--bump-build']: '1.0.0+43',
+        ['bump', 'major', '--build=foo']: '1.0.0+foo',
+        ['bump', 'major', '--pre=beta']: '1.0.0-beta',
+        ['bump', 'minor']: '0.1.0',
+        ['bump', 'minor', '--keep-build']: '0.1.0+42',
+        ['bump', 'minor', '--bump-build']: '0.1.0+43',
+        ['bump', 'minor', '--build=foo']: '0.1.0+foo',
+        ['bump', 'minor', '--pre=beta']: '0.1.0-beta',
+        ['bump', 'patch']: '0.0.5',
+        ['bump', 'patch', '--keep-build']: '0.0.5+42',
+        ['bump', 'patch', '--bump-build']: '0.0.5+43',
+        ['bump', 'patch', '--build=foo']: '0.0.5+foo',
+        ['bump', 'patch', '--pre=beta']: '0.0.5-beta',
+        ['bump', 'build']: '0.0.5-alpha+43',
+        ['bump', 'build', '--pre=beta']: '0.0.5-beta+43',
+        ['bump', 'pre']: '0.0.5-alpha.1',
+        ['bump', 'pre', '--keep-build']: '0.0.5-alpha.1+42',
+        ['bump', 'pre', '--bump-build']: '0.0.5-alpha.1+43',
+        ['bump', 'pre', '--build=foo']: '0.0.5-alpha.1+foo',
+        ['bump', 'pre', '--pre=beta']: '0.0.5-beta',
+      }.forEach((args, expected) {
+        test(args.join(' ') + ' => $expected', () async {
+          final code = await cider.run(args);
+          expect(code, 0);
+          out.buffer.clear();
+          await cider.run(['version']);
+          expect(out.buffer.toString().trim(), expected);
+        });
+      });
     });
   });
 }
