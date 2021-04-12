@@ -1,5 +1,5 @@
 name: cider
-version: 0.1.0-dev
+version: 0.1.0-dev.0
 description: Tools for Dart package maintainers. Automates CHANGLELOG and pubspec.yaml updates.
 homepage: https://github.com/f3ath/cider
 repository: https://github.com/f3ath/cider
@@ -29,3 +29,7 @@ dev_dependencies:
 executables:
   cider: cider
 
+cider:
+  link_template:
+    tag: 'https://github.com/f3ath/cider/releases/tag/%tag%' # initial release link template
+    diff: 'https://github.com/f3ath/cider/compare/%from%...%to%' # subsequent releases link template

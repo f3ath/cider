@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- NNBD support.
+- Sound null-safety.
+- Support for pre-release version part.
+- Ability to bump build together with other version parts.
 - A plugin system to improve extensibility.
 
 ### Changed
