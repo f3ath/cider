@@ -21,6 +21,4 @@ doc/api/
 *.js.map
 
 # test_coverage
-test/.test_coverage.dart
-coverage
-coverage_badge.svg
+/.coverage/

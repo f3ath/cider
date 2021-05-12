@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Sound null-safety.
+- Support for pre-release version part.
+- Ability to bump build together with other version parts.
+- A plugin system to improve extensibility.
+
+### Changed
+- Configuration moved to pubspec.yaml.
+
 ## [0.0.5] - 2020-09-09
 ### Added
 - Setting version explicitly
@@ -12,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.4] - 2020-08-10
 ### Changed
-- Using a yaml manipulation library to updatd pubspec.yaml. This expected to be more reliable than a regexp.
+- Using a yaml manipulation library to updated pubspec.yaml. This expected to be more reliable than a regexp.
 
 ## [0.0.3] - 2020-08-09
 ### Changed
