@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:change/change.dart';
-import 'package:cider/cider.dart';
 import 'package:cider/src/cider.dart';
+import 'package:cider/src/cider_command.dart';
 import 'package:cider/src/service/pubspec_service.dart';
 import 'package:markdown/markdown.dart';
 import 'package:path/path.dart';
