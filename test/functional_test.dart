@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:cider/cider.dart';
-import 'package:cider/testing.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
+
+import 'src/testing.dart';
 
 void main() {
   late Directory temp;
