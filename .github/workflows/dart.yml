@@ -18,13 +18,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: dart pub get
-      - name: Format
-        run: dartfmt --dry-run --set-exit-if-changed lib test example
+      - name: Formatter
+        run: dart format --output none --set-exit-if-changed example lib test
       - name: Analyzer
         run: dart analyze --fatal-infos --fatal-warnings
-      - name: Clean coverage
-        run: rm -rf .coverage
       - name: Tests
-        run: dart test --coverage=.coverage
+        run: dart test --coverage=coverage
       - name: Coverage
-        run: dart run coverage:format_coverage -l -c -i .coverage --report-on=lib --packages=.packages | dart run check_coverage:check_coverage 80
+        run: dart run coverage:format_coverage -l -c -i coverage --report-on=lib --packages=.packages | dart run check_coverage:check_coverage 94

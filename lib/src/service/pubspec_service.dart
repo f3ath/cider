@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:cider/cider.dart';
 import 'package:cider/src/cider.dart';
+import 'package:cider/src/cider_command.dart';
 import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';

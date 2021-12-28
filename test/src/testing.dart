@@ -11,34 +11,26 @@ class MockStdout implements io.Stdout {
   Encoding encoding = Utf8Codec();
 
   @override
-  void add(List<int> data) {
-    // TODO: implement add
-  }
+  void add(List<int> data) {}
 
   @override
-  void addError(Object error, [StackTrace? stackTrace]) {
-    // TODO: implement addError
-  }
+  void addError(Object error, [StackTrace? stackTrace]) {}
 
   @override
   Future addStream(Stream<List<int>> stream) {
-    // TODO: implement addStream
     throw UnimplementedError();
   }
 
   @override
   Future close() {
-    // TODO: implement close
     throw UnimplementedError();
   }
 
   @override
-  // TODO: implement done
   Future get done => throw UnimplementedError();
 
   @override
   Future flush() {
-    // TODO: implement flush
     throw UnimplementedError();
   }
 
@@ -46,7 +38,6 @@ class MockStdout implements io.Stdout {
   bool hasTerminal = true;
 
   @override
-  // TODO: implement nonBlocking
   io.IOSink get nonBlocking => throw UnimplementedError();
 
   @override
