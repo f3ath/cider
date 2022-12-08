@@ -33,6 +33,7 @@ class PubspecService {
         get<PubspecService>().writeVersion(version);
       }
       get<Stdout>().writeln(get<PubspecService>().readVersion());
+      return null;
     });
 
     cider.addCommand(_BumpCommand(_bumpCommands.keys), (args, get) {
@@ -46,6 +47,7 @@ class PubspecService {
           build: args['build'],
           pre: args['pre']);
       get<Stdout>().writeln(result);
+      return null;
     });
   }
 

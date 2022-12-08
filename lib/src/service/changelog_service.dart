@@ -19,12 +19,14 @@ class ChangelogService {
 
     cider.addCommand(_LogCommand(), (args, get) {
       get<ChangelogService>().addUnreleased(args.rest.first, args.rest[1]);
+      return null;
     });
 
     cider.addCommand(_DescribeCommand(), (args, get) {
       final version = args.rest.isEmpty ? null : args.rest.first;
       final section = get<ChangelogService>().describe(version);
       get<Stdout>().writeln(section);
+      return null;
     });
 
     cider.addCommand(_ReleaseCommand(), (args, get) {
@@ -33,6 +35,7 @@ class ChangelogService {
           date == 'today' ? DateTime.now() : DateTime.parse(date);
       final release = get<ChangelogService>().release(parsedDate);
       get<Stdout>().writeln(release);
+      return null;
     });
   }
 
@@ -79,6 +82,7 @@ class ChangelogService {
   /// Reads the project changelog
   Changelog? read() {
     if (_file.existsSync()) return parseChangelog(_file.readAsStringSync());
+    return null;
   }
 
   /// Returns a markdown description of the given [version] or the `Unreleased`
