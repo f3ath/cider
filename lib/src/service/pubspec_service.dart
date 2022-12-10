@@ -13,6 +13,16 @@ class PubspecService {
   PubspecService(Directory root)
       : _file = File(join(root.path, 'pubspec.yaml'));
 
+  static final _bumpCommands = <String, VersionMutation>{
+    'breaking': BumpBreaking(),
+    'build': BumpBuild(),
+    'major': BumpMajor(),
+    'minor': BumpMinor(),
+    'patch': BumpPatch(),
+    'pre': BumpPreRelease(),
+    'release': Release(),
+  };
+
   /// Publishes the [PubspecService] and installs commands (`version`, `bump`)
   static void install(Cider cider) {
     cider.provide((get) => PubspecService(get<Directory>('root')));
@@ -23,9 +33,10 @@ class PubspecService {
         get<PubspecService>().writeVersion(version);
       }
       get<Stdout>().writeln(get<PubspecService>().readVersion());
+      return null;
     });
 
-    cider.addCommand(_BumpCommand(), (args, get) {
+    cider.addCommand(_BumpCommand(_bumpCommands.keys), (args, get) {
       final pubspec = get<PubspecService>();
       final part = args.command?.name;
       if (part == null) throw 'Version part must be specified';
@@ -36,6 +47,7 @@ class PubspecService {
           build: args['build'],
           pre: args['pre']);
       get<Stdout>().writeln(result);
+      return null;
     });
   }
 
@@ -59,15 +71,7 @@ class PubspecService {
       bool bumpBuild = false,
       String build = '',
       String pre = ''}) {
-    final map = <String, VersionMutation>{
-      'breaking': BumpBreaking(),
-      'major': BumpMajor(),
-      'minor': BumpMinor(),
-      'patch': BumpPatch(),
-      'pre': BumpPreRelease(),
-      'build': BumpBuild(),
-    };
-    var mutation = map[part.toLowerCase()] ??
+    var mutation = _bumpCommands[part.toLowerCase()] ??
         (throw ArgumentError('Invalid version part'));
     if (keepBuild) {
       mutation = KeepBuild(mutation);
@@ -114,14 +118,12 @@ class _VersionCommand extends CiderCommand {
 }
 
 class _BumpCommand extends CiderCommand {
-  _BumpCommand() : super('bump', 'Bump project version') {
+  _BumpCommand(Iterable<String> commands)
+      : super('bump', 'Bump project version') {
+    for (final command in commands) {
+      argParser.addCommand(command);
+    }
     argParser
-      ..addCommand('breaking')
-      ..addCommand('major')
-      ..addCommand('minor')
-      ..addCommand('patch')
-      ..addCommand('pre')
-      ..addCommand('build')
       ..addFlag('keep-build', help: 'Keep the existing build')
       ..addFlag('bump-build', help: 'Also bump the build')
       ..addOption('build',

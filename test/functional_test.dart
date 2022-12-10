@@ -126,8 +126,10 @@ void main() {
         ['bump', 'pre', '--bump-build']: '0.0.5-alpha.1+43',
         ['bump', 'pre', '--build=foo']: '0.0.5-alpha.1+foo',
         ['bump', 'pre', '--pre=beta']: '0.0.5-beta',
+        ['bump', 'release']: '0.0.5',
+        ['bump', 'release', '--keep-build']: '0.0.5+42',
       }.forEach((args, expected) {
-        test(args.join(' ') + ' => $expected', () async {
+        test('${args.join(' ')} => $expected', () async {
           final code = await cider.run(args);
           expect(code, 0);
           out.buffer.clear();

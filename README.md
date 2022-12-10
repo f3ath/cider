@@ -106,10 +106,10 @@ cider version <new_version>
 
 Examples:
 
-Version before | Command | Version after
---- | --- | ---
-1.2.3+1 | `cider version 3.2.1`  | 3.2.1
-0.2.1-dev | `cider version 0.0.1-alpha+42`  | 0.0.1-alpha+42
+ Version before | Command                        | Version after  
+----------------|--------------------------------|----------------
+ 1.2.3+1        | `cider version 3.2.1`          | 3.2.1          
+ 0.2.1-dev      | `cider version 0.0.1-alpha+42` | 0.0.1-alpha+42 
 
 ### Bumping the project version
 
@@ -126,6 +126,7 @@ cider bump <part> [options]
     - `patch`
     - `build`
     - `pre` (pre-release)
+    - `release` (promotes the version to a release, removing the pre-release part)
 
 Options:
 
@@ -142,19 +143,21 @@ corresponding part.
 Remember that according to [semver] v2, `build` is considered metadata and is ignored when determining version
 precedence.
 
-Version before      | Command                                       | Version after
----                 | ---                                           | ---
-1.2.1-alpha+42      | `cider bump breaking`                         | 2.0.0
-0.2.1-alpha+42      | `cider bump breaking`                         | 0.3.0
-0.2.1-alpha+42      | `cider bump major`                            | 1.0.0
-0.2.1-alpha+42      | `cider bump minor`                            | 0.3.0
-0.2.1-alpha+42      | `cider bump patch`                            | 0.2.1
-0.2.1               | `cider bump patch`                            | 0.2.2
-0.2.1-alpha+42      | `cider bump pre`                              | 0.2.1-alpha.1
-1.2.1-alpha+42      | `cider bump breaking --keep-build`            | 2.0.0+42
-0.2.1-alpha+42      | `cider bump breaking --bump-build`            | 0.3.0+43
-0.2.1-alpha+42      | `cider bump major --build=2020-02-02`         | 1.0.0+2020-02-02
-0.2.1-alpha+42      | `cider bump minor --pre=aplha --bump-build`   | 0.3.0-alpha+43
+ Version before | Command                                     | Version after    
+----------------|---------------------------------------------|------------------
+ 1.2.1-alpha+42 | `cider bump breaking`                       | 2.0.0            
+ 0.2.1-alpha+42 | `cider bump breaking`                       | 0.3.0            
+ 0.2.1-alpha+42 | `cider bump major`                          | 1.0.0            
+ 0.2.1-alpha+42 | `cider bump minor`                          | 0.3.0            
+ 0.2.1-alpha+42 | `cider bump patch`                          | 0.2.1            
+ 0.2.1          | `cider bump patch`                          | 0.2.2            
+ 0.2.1-alpha+42 | `cider bump pre`                            | 0.2.1-alpha.1    
+ 1.2.1-alpha+42 | `cider bump breaking --keep-build`          | 2.0.0+42         
+ 0.2.1-alpha+42 | `cider bump breaking --bump-build`          | 0.3.0+43         
+ 0.2.1-alpha+42 | `cider bump major --build=2020-02-02`       | 1.0.0+2020-02-02 
+ 0.2.1-alpha+42 | `cider bump minor --pre=aplha --bump-build` | 0.3.0-alpha+43   
+ 0.2.1-alpha+42 | `cider bump release`                        | 0.2.1            
+ 0.2.1-alpha+42 | `cider bump release --keep-build`           | 0.2.1+43         
 
 [logo]: https://raw.githubusercontent.com/f3ath/cider/master/cider.png
 

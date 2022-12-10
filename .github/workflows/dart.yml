@@ -4,16 +4,12 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     container:
-      image:  google/dart:latest
-
+      image:  dart:stable
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -25,4 +21,4 @@ jobs:
       - name: Tests
         run: dart test --coverage=.coverage
       - name: Coverage
-        run: dart run coverage:format_coverage -l -c -i .coverage --report-on=lib --packages=.packages | dart run check_coverage:check_coverage 94
+        run: dart run coverage:format_coverage -l -c -i .coverage --report-on=lib --packages=.dart_tool/package_config.json | dart run check_coverage:check_coverage 94
