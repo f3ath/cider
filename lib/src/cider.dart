@@ -67,8 +67,7 @@ class Cider {
       final cmd = await _runner.run(args);
       final handler = _handler[cmd];
       if (handler != null) {
-        final code = await handler(cmd!.argResults!, _di.get);
-        return code ?? 0;
+        return await handler(cmd!.argResults!, _di.get);
       }
       return 0;
     } on Error catch (e) {
@@ -80,4 +79,4 @@ class Cider {
 }
 
 /// A command handler
-typedef Handler = FutureOr<int?> Function(ArgResults args, ServiceLocator get);
+typedef Handler = FutureOr<int> Function(ArgResults args, ServiceLocator get);

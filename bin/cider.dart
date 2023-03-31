@@ -2,5 +2,6 @@ import 'dart:io';
 
 import 'package:cider/cider.dart';
 
-void main(List<String> args) =>
-    Cider().run(args).then((code) => exitCode = code);
+Future<void> main(List<String> args) async {
+  exitCode = await Cider().run(args);
+}
