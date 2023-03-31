@@ -1,0 +1,12 @@
+# .github/workflows/publish.yml
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*' # tag-pattern on pub.dev: 'v'
+
+# Publish using the reusable workflow from dart-lang.
+jobs:
+  publish:
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
