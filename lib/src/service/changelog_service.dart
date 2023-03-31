@@ -42,7 +42,8 @@ class ChangelogService {
       final version = args.rest.first;
       final release = get<ChangelogService>().yank(version);
       get<Stdout>().writeln(release);
-      return 0;    });
+      return 0;
+    });
 
     cider.addCommand(_Unyank(), (args, get) {
       final version = args.rest.first;
