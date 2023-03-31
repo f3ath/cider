@@ -17,25 +17,38 @@ class ChangelogService {
     cider.provide((get) =>
         ChangelogService(get<Directory>('root'), get<PubspecService>()));
 
-    cider.addCommand(_LogCommand(), (args, get) {
+    cider.addCommand(_Log(), (args, get) {
       get<ChangelogService>().addUnreleased(args.rest.first, args.rest[1]);
-      return null;
+      return 0;
     });
 
-    cider.addCommand(_DescribeCommand(), (args, get) {
+    cider.addCommand(_Describe(), (args, get) {
       final version = args.rest.isEmpty ? null : args.rest.first;
       final section = get<ChangelogService>().describe(version);
       get<Stdout>().writeln(section);
-      return null;
+      return 0;
     });
 
-    cider.addCommand(_ReleaseCommand(), (args, get) {
+    cider.addCommand(_Release(), (args, get) {
       final date = args['date'];
       final parsedDate =
           date == 'today' ? DateTime.now() : DateTime.parse(date);
       final release = get<ChangelogService>().release(parsedDate);
       get<Stdout>().writeln(release);
-      return null;
+      return 0;
+    });
+
+    cider.addCommand(_Yank(), (args, get) {
+      final version = args.rest.first;
+      final release = get<ChangelogService>().yank(version);
+      get<Stdout>().writeln(release);
+      return 0;    });
+
+    cider.addCommand(_Unyank(), (args, get) {
+      final version = args.rest.first;
+      final release = get<ChangelogService>().unyank(version);
+      get<Stdout>().writeln(release);
+      return 0;
     });
   }
 
@@ -79,6 +92,22 @@ class ChangelogService {
         printChangelog(changelog, keepEmptyUnreleased: keepEmptyUnreleased));
   }
 
+  String yank(String version) {
+    final log = read() ?? (throw StateError('No changelog found'));
+    final release = log.get(version);
+    release.isYanked = true;
+    write(log);
+    return printRelease(release);
+  }
+
+  String unyank(String version) {
+    final log = read() ?? (throw StateError('No changelog found'));
+    final release = log.get(version);
+    release.isYanked = false;
+    write(log);
+    return printRelease(release);
+  }
+
   /// Reads the project changelog
   Changelog? read() {
     if (_file.existsSync()) return parseChangelog(_file.readAsStringSync());
@@ -120,18 +149,26 @@ class ChangelogService {
   }
 }
 
-class _LogCommand extends CiderCommand {
-  _LogCommand() : super('log', 'Add a new entry to the changelog');
+class _Log extends CiderCommand {
+  _Log() : super('log', 'Add a new entry to the changelog');
 }
 
-class _DescribeCommand extends CiderCommand {
-  _DescribeCommand() : super('describe', 'Print the version description');
+class _Describe extends CiderCommand {
+  _Describe() : super('describe', 'Print the version description');
 }
 
-class _ReleaseCommand extends CiderCommand {
-  _ReleaseCommand() : super('release', 'Release the unreleased changes') {
+class _Release extends CiderCommand {
+  _Release() : super('release', 'Release the unreleased changes') {
     argParser.addOption('date', help: 'Release date', defaultsTo: 'today');
   }
+}
+
+class _Yank extends CiderCommand {
+  _Yank() : super('yank', 'Yank a version from the changelog');
+}
+
+class _Unyank extends CiderCommand {
+  _Unyank() : super('unyank', 'Unyank a version from the changelog');
 }
 
 extension _String on String {

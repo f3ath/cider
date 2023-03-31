@@ -78,6 +78,22 @@ void main() {
 [1.1.0]: https://github.com/example/project/compare/1.0.0...1.1.0
 ''';
     expect(out.buffer.toString(), step4);
+    out.buffer.clear();
+    await cider.run(['yank', '1.1.0']);
+    final step5 = '''
+## [1.1.0] - 2021-02-03 \\[YANKED\\]
+### Changed
+- New turbo V6 engine installed
+
+### Fixed
+- Wheels falling off sporadically
+
+[1.1.0]: https://github.com/example/project/compare/1.0.0...1.1.0
+''';
+    expect(out.buffer.toString(), step5);
+    out.buffer.clear();
+    await cider.run(['unyank', '1.1.0']);
+    expect(out.buffer.toString(), step4);
   });
 
   group('Version', () {
