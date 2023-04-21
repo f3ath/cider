@@ -171,7 +171,7 @@ precedence.
 | 1.2.1-alpha+42 | `cider bump breaking --keep-build`          | 2.0.0+42         |
 | 0.2.1-alpha+42 | `cider bump breaking --bump-build`          | 0.3.0+43         |
 | 0.2.1-alpha+42 | `cider bump major --build=2020-02-02`       | 1.0.0+2020-02-02 |
-| 0.2.1-alpha+42 | `cider bump minor --pre=aplha --bump-build` | 0.3.0-alpha+43   |
+| 0.2.1-alpha+42 | `cider bump minor --pre=alpha --bump-build` | 0.3.0-alpha+43   |
 | 0.2.1-alpha+42 | `cider bump release`                        | 0.2.1            |
 | 0.2.1-alpha+42 | `cider bump release --keep-build`           | 0.2.1+42         |
 
