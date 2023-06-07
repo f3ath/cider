@@ -31,7 +31,9 @@ class Cider {
   /// Throws a [StateError] if 'pubspec.yaml' can not be located.
   static io.Directory _findRoot(io.Directory dir) {
     if (io.File(join(dir.path, 'pubspec.yaml')).existsSync()) return dir;
-    if (dir == dir.parent) throw StateError('Can not find project root');
+    if (io.FileSystemEntity.identicalSync(dir.path, dir.parent.path)) {
+      throw StateError('Can not find project root');
+    }
     return _findRoot(dir.parent);
   }
 
