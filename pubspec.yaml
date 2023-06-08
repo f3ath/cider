@@ -1,5 +1,5 @@
 name: cider
-version: 0.1.5
+version: 0.1.6
 description: Tools for Dart package maintainers. Automates changelog and pubspec.yaml updates.
 homepage: https://github.com/f3ath/cider
 repository: https://github.com/f3ath/cider
