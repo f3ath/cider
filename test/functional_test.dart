@@ -1,27 +1,30 @@
 import 'dart:io';
 
-import 'package:cider/cider.dart';
+import 'package:cider/src/cider.dart';
+import 'package:cider/src/cli/cider_cli.dart';
+import 'package:cider/src/cli/printer.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
-import 'src/testing.dart';
-
 void main() {
   late Directory temp;
-  late Cider cider;
-  late MockStdout out, err;
+  final cider = Cider();
+  final out = BufferChannel();
+  final err = BufferChannel();
+  final cli = CiderCli(cider, Printer(out: out, err: err));
+
+  Future<int?> run(List<String> args) =>
+      cli.run(['--project-root=${temp.absolute.path}', ...args]);
+
   setUp(() async {
     temp = await Directory.systemTemp.createTemp();
-    await Directory('test/template').list().forEach((element) {
+    await Directory('test/template').list().forEach((element) async {
       if (element is File) {
-        element.copy(join(temp.path, basename(element.path)));
+        await element.copy(join(temp.path, basename(element.path)));
       }
     });
-    out = MockStdout();
-    err = MockStdout();
-    cider = Cider(root: temp);
-    cider.provide<Stdout>((_) => out);
-    cider.provide<Stdout>((_) => err, name: 'stderr');
+    out.buffer.clear();
+    err.buffer.clear();
   });
 
   tearDown(() async {
@@ -29,18 +32,18 @@ void main() {
   });
 
   test('Full release cycle', () async {
-    final code = await cider.run(['log', 'add', 'Initial release']);
+    final code = await run(['log', 'add', 'Initial release']);
     expect(code, 0);
-    await cider.run(['describe']);
+    await run(['describe']);
     final step1 = '''
 ## Unreleased
 ### Added
 - Initial release
 ''';
     expect(out.buffer.toString(), step1);
-    await cider.run(['version', '1.0.0']);
+    await run(['version', '1.0.0']);
     out.buffer.clear();
-    await cider.run(['release', '--date=2020-01-02']);
+    await run(['release', '--date=2020-01-02']);
     final step2 = '''
 ## [1.0.0] - 2020-01-02
 ### Added
@@ -50,9 +53,9 @@ void main() {
 ''';
     expect(out.buffer.toString(), step2);
     out.buffer.clear();
-    await cider.run(['log', 'change', 'New turbo V6 engine installed']);
-    await cider.run(['log', 'fix', 'Wheels falling off sporadically']);
-    await cider.run(['describe']);
+    await run(['log', 'change', 'New turbo V6 engine installed']);
+    await run(['log', 'fix', 'Wheels falling off sporadically']);
+    await run(['describe']);
     final step3 = '''
 ## [Unreleased]
 ### Changed
@@ -64,9 +67,9 @@ void main() {
 [Unreleased]: https://github.com/example/project/compare/1.0.0...HEAD
 ''';
     expect(out.buffer.toString(), step3);
-    await cider.run(['bump', 'minor']);
+    await run(['bump', 'minor']);
     out.buffer.clear();
-    await cider.run(['release', '--date=2021-02-03']);
+    await run(['release', '--date=2021-02-03']);
     final step4 = '''
 ## [1.1.0] - 2021-02-03
 ### Changed
@@ -79,7 +82,7 @@ void main() {
 ''';
     expect(out.buffer.toString(), step4);
     out.buffer.clear();
-    await cider.run(['yank', '1.1.0']);
+    await run(['yank', '1.1.0']);
     final step5 = '''
 ## [1.1.0] - 2021-02-03 \\[YANKED\\]
 ### Changed
@@ -92,23 +95,23 @@ void main() {
 ''';
     expect(out.buffer.toString(), step5);
     out.buffer.clear();
-    await cider.run(['unyank', '1.1.0']);
+    await run(['unyank', '1.1.0']);
     expect(out.buffer.toString(), step4);
   });
 
   group('Version', () {
     test('get', () async {
-      final code = await cider.run(['version']);
+      final code = await run(['version']);
       expect(code, 0);
       expect(out.buffer.toString().trim(), '0.0.5-alpha+42');
     });
 
     test('set', () async {
-      final code = await cider.run(['version', '1.0.0']);
+      final code = await run(['version', '1.0.0']);
       expect(code, 0);
       expect(out.buffer.toString().trim(), '1.0.0');
       out.buffer.clear();
-      await cider.run(['version']);
+      await run(['version']);
       expect(out.buffer.toString().trim(), '1.0.0');
     });
 
@@ -146,10 +149,10 @@ void main() {
         ['bump', 'release', '--keep-build']: '0.0.5+42',
       }.forEach((args, expected) {
         test('${args.join(' ')} => $expected', () async {
-          final code = await cider.run(args);
+          final code = await run(args);
           expect(code, 0);
           out.buffer.clear();
-          await cider.run(['version']);
+          await run(['version']);
           expect(out.buffer.toString().trim(), expected);
         });
       });

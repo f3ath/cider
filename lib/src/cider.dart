@@ -1,84 +1,78 @@
-import 'dart:async';
-import 'dart:io' as io;
+import 'package:cider/src/changelog_service.dart';
+import 'package:cider/src/pubspec_service.dart';
+import 'package:pub_semver/pub_semver.dart';
+import 'package:rfc_6901/rfc_6901.dart';
+import 'package:version_manipulation/mutations.dart';
 
-import 'package:args/args.dart';
-import 'package:args/command_runner.dart';
-import 'package:cider/cider.dart';
-import 'package:cider/src/cider_command.dart';
-import 'package:cider/src/service/changelog_service.dart';
-import 'package:cider/src/service/pubspec_service.dart';
-import 'package:klizma/klizma.dart';
-import 'package:path/path.dart';
-
+/// The core application.
 class Cider {
-  Cider(
-      {Iterable<void Function(Cider cider)> plugins = const [],
-      String name = 'cider',
-      String description = 'Dart package release tools.',
-      io.Directory? root})
-      : _runner = CommandRunner<CiderCommand>(name, description) {
-    _di.provide((_) => _findRoot(root ?? io.Directory.current), name: 'root');
-    _di.provide<io.Stdout>((_) => io.stdout);
-    _di.provide<io.Stdout>((_) => io.stderr, name: 'stderr');
-    [
-      PubspecService.install,
-      ChangelogService.install,
-    ].followedBy(plugins).forEach((install) => install(this));
+  /// Reads the project version from pubspec.yaml.
+  Future<Version> getVersion(Context context) => _pubspec(context).getVersion();
+
+  /// Writes the project version to pubspec.yaml.
+  Future<void> setVersion(Context context, String version) =>
+      _pubspec(context).setVersion(Version.parse(version));
+
+  Future<String> bumpVersion(Context context, VersionMutation mutation,
+          {bool keepBuild = false,
+          bool bumpBuild = false,
+          String build = '',
+          String pre = ''}) async =>
+      (await _pubspec(context).mutateVersion(mutation,
+              keepBuild: keepBuild,
+              bumpBuild: bumpBuild,
+              build: build,
+              pre: pre))
+          .toString();
+
+  /// Adds a new entry to the `Unreleased` section.
+  /// Type is one of `a`, `c`, `d`, `f`, `r`, `s`.
+  Future<void> addUnreleased(
+      Context context, String type, String description) async {
+    await (await _changelog(context)).addUnreleased(type, description);
   }
 
-  /// Finds the project root by locating 'pubspec.yaml'.
-  /// Starts from [dir] and makes its way up to the system root folder.
-  /// Throws a [StateError] if 'pubspec.yaml' can not be located.
-  static io.Directory _findRoot(io.Directory dir) {
-    if (io.File(join(dir.path, 'pubspec.yaml')).existsSync()) return dir;
-    if (io.FileSystemEntity.identicalSync(dir.path, dir.parent.path)) {
-      throw StateError('Can not find project root');
-    }
-    return _findRoot(dir.parent);
+  /// Returns a markdown description of the given [version] or the `Unreleased`
+  /// section.
+  Future<String> describe(Context context, String? version) async =>
+      (await _changelog(context)).describe(version);
+
+  /// Releases the `Unreleased` section.
+  /// Returns the description of the created release.
+  Future<String> release(Context context, DateTime date,
+          {Version? version}) async =>
+      (await _changelog(context))
+          .release(date, version ?? await _pubspec(context).getVersion());
+
+  Future<String> yank(Context context, String version) async =>
+      (await _changelog(context)).yank(version);
+
+  Future<String> unyank(Context context, String version) async =>
+      (await _changelog(context)).unyank(version);
+
+  Future<ChangelogService> _changelog(Context context) async {
+    final ps = _pubspec(context);
+    final config = await ps.getValue('/cider', orElse: () => {});
+    final diffTemplate = JsonPointer('/link_template/diff')
+        .read(config, orElse: () => '')
+        .toString();
+    final tagTemplate = JsonPointer('/link_template/tag')
+        .read(config, orElse: () => '')
+        .toString();
+    final keepEmptyUnreleased = JsonPointer('/keep_empty_unreleased')
+        .read(config, orElse: () => false) as bool;
+    return ChangelogService(context.projectRoot,
+        diffTemplate: diffTemplate,
+        tagTemplate: tagTemplate,
+        keepEmptyUnreleased: keepEmptyUnreleased);
   }
 
-  static const exitOK = 0;
-  static const exitUsageException = 1;
-  static const exitException = 64;
-
-  final _di = Container();
-  final _handler = <CiderCommand, Handler>{};
-  final CommandRunner<CiderCommand> _runner;
-
-  /// Adds a new service to be available for other services and handlers
-  /// Some of the built-in services are:
-  /// - `get<Directory>('root')` - project root folder (the one containing pubspec.yaml)
-  /// - `get<PubspecService>()` - manipulates the pubspec.yaml
-  /// - `get<ChangelogService>()` - manipulates the changelog
-  /// - `get<Stdout>()` - the dart:io `stdout` sink (for testability)
-  /// - `get<Stdout>('stderr')` - the dart:io `stderr` sink (for testability)
-  void provide<T extends Object>(FactoryFun<T> factory,
-      {String name = '', bool cached = true}) {
-    _di.provide<T>(factory, name: name, cached: cached);
-  }
-
-  /// Adds a new [command] which, when invoked, will be served by the handler
-  /// produced by [handlerFactory].
-  void addCommand(CiderCommand command, Handler handler) {
-    _handler[command] = handler;
-    _runner.addCommand(command);
-  }
-
-  Future<int> run(Iterable<String> args) async {
-    try {
-      final cmd = await _runner.run(args);
-      final handler = _handler[cmd];
-      if (handler != null) {
-        return await handler(cmd!.argResults!, _di.get);
-      }
-      return 0;
-    } on Error catch (e) {
-      _di.get<io.Stdout>('stderr').writeln(e);
-      _di.get<io.Stdout>('stderr').writeln(e.stackTrace);
-      return exitException;
-    }
-  }
+  PubspecService _pubspec(Context context) =>
+      PubspecService(context.projectRoot);
 }
 
-/// A command handler
-typedef Handler = FutureOr<int> Function(ArgResults args, ServiceLocator get);
+class Context {
+  Context(this.projectRoot);
+
+  final String projectRoot;
+}
