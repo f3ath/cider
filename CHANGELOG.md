@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.6] - 2023-06-07
 ### Fixed
-- Correctly abort upwards search for project root directory upon reaching filesystem root.
+- Correctly abort upwards search for project root directory upon reaching filesystem root. (thanks [@maltevesper](https://github.com/maltevesper))
 
 ## [0.1.5] - 2023-03-30
 ### Added
