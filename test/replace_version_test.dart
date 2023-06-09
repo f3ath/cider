@@ -12,7 +12,7 @@ void main() {
     test('throws StateError when duplicate version pattern', () {
       final pubspec = 'name: my_app\nversion: 1.0.0\nversion: 1.0.0\n';
       expect(
-            () => replaceVersion(pubspec, '1.0.0', '2.0.0'),
+        () => replaceVersion(pubspec, '1.0.0', '2.0.0'),
         throwsA(isA<StateError>()),
       );
     });
@@ -20,7 +20,7 @@ void main() {
     test('throws StateError when failed to replace version', () {
       final pubspec = 'name: my_app\nversion: 2.0.0\n';
       expect(
-            () => replaceVersion(pubspec, '1.0.0', '2.0.0'),
+        () => replaceVersion(pubspec, '1.0.0', '2.0.0'),
         throwsA(isA<StateError>()),
       );
     });

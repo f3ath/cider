@@ -1,6 +1,6 @@
 import 'package:cider/src/cli/channel.dart';
-import 'package:cider/src/cli/error_interceptor.dart';
 import 'package:cider/src/cli/console.dart';
+import 'package:cider/src/cli/error_interceptor.dart';
 import 'package:test/test.dart';
 
 void main() {
