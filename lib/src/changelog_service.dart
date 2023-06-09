@@ -5,7 +5,7 @@ import 'package:markdown/markdown.dart';
 import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
 
-/// Change log manipulation service
+/// Changelog manipulation service
 class ChangelogService {
   ChangelogService(String projectRoot,
       {this.diffTemplate = '',
@@ -29,10 +29,10 @@ class ChangelogService {
       'r': 'Removed',
       's': 'Security',
     };
-    type = map[type.substring(0, 1)]!;
-    final log = await read() ?? Changelog();
+    final typeFull = map[type.substring(0, 1)]!;
+    final log = await _read() ?? Changelog();
     final markdown = Document().parseInline(description);
-    final change = Change(type.capitalized, markdown);
+    final change = Change(typeFull, markdown);
     log.unreleased.add(change);
     if (diffTemplate.isNotEmpty) {
       final releases = log.history().toList();
@@ -43,42 +43,29 @@ class ChangelogService {
             .replaceAll('%to%', 'HEAD');
       }
     }
-    await write(log);
-  }
-
-  /// (Re)writes the changelog
-  Future<void> write(Changelog changelog) async {
-    await file.create(recursive: true);
-    await file.writeAsString(
-        printChangelog(changelog, keepEmptyUnreleased: keepEmptyUnreleased));
+    await _write(log);
   }
 
   Future<String> yank(String version) async {
-    final log = await read() ?? (throw StateError('No changelog found'));
+    final log = await _read() ?? (throw StateError('No changelog found'));
     final release = log.get(version);
     release.isYanked = true;
-    await write(log);
+    await _write(log);
     return printRelease(release);
   }
 
   Future<String> unyank(String version) async {
-    final log = await read() ?? (throw StateError('No changelog found'));
+    final log = await _read() ?? (throw StateError('No changelog found'));
     final release = log.get(version);
     release.isYanked = false;
-    await write(log);
+    await _write(log);
     return printRelease(release);
-  }
-
-  /// Reads the project changelog
-  Future<Changelog?> read() async {
-    if (await file.exists()) return parseChangelog(await file.readAsString());
-    return null;
   }
 
   /// Returns a markdown description of the given [version] or the `Unreleased`
   /// section.
   Future<String> describe([String? version]) async {
-    final log = await read() ?? Changelog();
+    final log = await _read() ?? Changelog();
     if (version == null) return printUnreleased(log.unreleased);
     return printRelease(log.get(version));
   }
@@ -86,7 +73,7 @@ class ChangelogService {
   /// Releases the `Unreleased` section.
   /// Returns the description of the created release.
   Future<String> release(DateTime date, Version version) async {
-    final log = await read() ?? Changelog();
+    final log = await _read() ?? Changelog();
     final release = Release(version, date);
     release.addAll(log.unreleased.changes());
     final parent = log.preceding(release.version);
@@ -100,8 +87,21 @@ class ChangelogService {
     }
     log.add(release);
     log.unreleased.clear();
-    write(log);
+    _write(log);
     return describe(release.version.toString());
+  }
+
+  /// Reads the project changelog
+  Future<Changelog?> _read() async {
+    if (await file.exists()) return parseChangelog(await file.readAsString());
+    return null;
+  }
+
+  /// (Re)writes the changelog
+  Future<void> _write(Changelog changelog) async {
+    await file.create(recursive: true);
+    await file.writeAsString(
+        printChangelog(changelog, keepEmptyUnreleased: keepEmptyUnreleased));
   }
 }
 

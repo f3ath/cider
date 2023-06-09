@@ -9,7 +9,6 @@ environment:
 dependencies:
   args: ^2.0.0
   change: ^0.6.0
-  klizma: ^0.2.0
   markdown: ^7.0.0
   path: ^1.6.0
   pub_semver: ^2.0.0

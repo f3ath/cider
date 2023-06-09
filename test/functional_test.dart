@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:cider/src/cider.dart';
+import 'package:cider/src/cli/channel.dart';
 import 'package:cider/src/cli/cider_cli.dart';
-import 'package:cider/src/cli/printer.dart';
-import 'package:path/path.dart';
+import 'package:cider/src/cli/console.dart';
+import 'package:path/path.dart' as path;
+import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -11,16 +13,16 @@ void main() {
   final cider = Cider();
   final out = BufferChannel();
   final err = BufferChannel();
-  final cli = CiderCli(cider, Printer(out: out, err: err));
+  final cli = CiderCli(cider, console: Console(out: out, err: err));
 
-  Future<int?> run(List<String> args) =>
+  Future<int> run(List<String> args) =>
       cli.run(['--project-root=${temp.absolute.path}', ...args]);
 
   setUp(() async {
     temp = await Directory.systemTemp.createTemp();
     await Directory('test/template').list().forEach((element) async {
       if (element is File) {
-        await element.copy(join(temp.path, basename(element.path)));
+        await element.copy(path.join(temp.path, path.basename(element.path)));
       }
     });
     out.buffer.clear();
@@ -29,6 +31,26 @@ void main() {
 
   tearDown(() async {
     await temp.delete(recursive: true);
+  });
+
+  group('Smoke', () {
+    test('Can read the project version', () async {
+      final actual = (await Process.run(
+              Platform.executable, ['bin/cider.dart', 'version']))
+          .stdout as String;
+      final expected = Pubspec.parse(await File('pubspec.yaml').readAsString())
+          .version!
+          .toString();
+      expect(actual.trim(), equals(expected));
+    });
+  });
+
+  test('Can read the project version', () async {
+    await cli.run(['version']);
+    final expected = Pubspec.parse(await File('pubspec.yaml').readAsString())
+        .version!
+        .toString();
+    expect(out.buffer.toString().trim(), equals(expected));
   });
 
   test('Full release cycle', () async {
@@ -51,6 +73,7 @@ void main() {
 
 [1.0.0]: https://github.com/example/project/releases/tag/1.0.0
 ''';
+    print(err.buffer);
     expect(out.buffer.toString(), step2);
     out.buffer.clear();
     await run(['log', 'change', 'New turbo V6 engine installed']);
@@ -97,6 +120,7 @@ void main() {
     out.buffer.clear();
     await run(['unyank', '1.1.0']);
     expect(out.buffer.toString(), step4);
+    expect(err.buffer.toString(), isEmpty);
   });
 
   group('Version', () {
@@ -104,6 +128,7 @@ void main() {
       final code = await run(['version']);
       expect(code, 0);
       expect(out.buffer.toString().trim(), '0.0.5-alpha+42');
+      expect(err.buffer.toString(), isEmpty);
     });
 
     test('set', () async {
@@ -113,6 +138,7 @@ void main() {
       out.buffer.clear();
       await run(['version']);
       expect(out.buffer.toString().trim(), '1.0.0');
+      expect(err.buffer.toString(), isEmpty);
     });
 
     group('bump', () {
@@ -151,10 +177,22 @@ void main() {
         test('${args.join(' ')} => $expected', () async {
           final code = await run(args);
           expect(code, 0);
+          expect(err.buffer.toString(), isEmpty);
           out.buffer.clear();
           await run(['version']);
           expect(out.buffer.toString().trim(), expected);
         });
+      });
+      test('version must increase', () async {
+        final code = await run(['bump', 'build', '--keep-build']);
+        expect(code, 65);
+        expect(err.buffer.toString().trim(),
+            'The next version must be higher than the current one.');
+      });
+      test('version part must be specified', () async {
+        final code = await run(['bump']);
+        expect(code, 65);
+        expect(err.buffer.toString().trim(), 'Version part must be specified');
       });
     });
   });

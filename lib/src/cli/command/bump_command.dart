@@ -30,11 +30,10 @@ class BumpCommand extends CiderCommand {
 
   @override
   Future<int> run() async {
-    final part =
-        argResults!.command?.name ?? (throw 'Version part must be specified');
-    final mutation = mutations[part] ?? (throw 'Invalid bump command');
+    final part = argResults!.command?.name ??
+        (throw ArgumentError('Version part must be specified'));
 
-    final result = await cider.bumpVersion(context, mutation,
+    final result = await cider.bumpVersion(context, mutations[part]!,
         keepBuild: argResults!['keep-build'],
         bumpBuild: argResults!['bump-build'],
         build: argResults!['build'],

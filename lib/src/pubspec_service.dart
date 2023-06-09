@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cider/src/replace_version.dart';
 import 'package:path/path.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
@@ -19,20 +20,8 @@ class PubspecService {
 
   /// Writes the project version to pubspec.yaml.
   Future<void> setVersion(Version version) async {
-    final current = await getVersion();
-    final regex = RegExp(r'^version:\s+(\d+\.\d+\.\d+.*)$', multiLine: true);
-    final content = await _readString();
-    var processed = false;
-    final updated = content.replaceAllMapped(regex, (match) {
-      if (processed) throw StateError('Duplicate version pattern');
-      if (match.group(1) == current.toString()) {
-        processed = true;
-        return 'version: $version';
-      }
-      return match.group(0)!;
-    });
-    if (!processed) throw Exception('Failed to replace version');
-    await _writeString(updated);
+    await _writeString(replaceVersion(await _readString(),
+        (await getVersion()).toString(), version.toString()));
   }
 
   Future<Version> mutateVersion(VersionMutation mutation,
@@ -55,7 +44,8 @@ class PubspecService {
     final current = await getVersion();
     final next = mutation(current);
     if (next <= current) {
-      throw ArgumentError('The next version must be higher than current');
+      throw ArgumentError(
+          'The next version must be higher than the current one.');
     }
     await setVersion(next);
     return next;
@@ -72,8 +62,7 @@ class PubspecService {
 
   Future<String> _readString() => _file.readAsString();
 
-  Future<YamlMap> _readYaml() async =>
-      loadYaml(await _file.readAsString());
+  Future<YamlMap> _readYaml() async => loadYaml(await _file.readAsString());
 
   Future<void> _writeString(String contents) => _file.writeAsString(contents);
 }
