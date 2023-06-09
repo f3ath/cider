@@ -64,5 +64,6 @@ class PubspecService {
 
   Future<YamlMap> _readYaml() async => loadYaml(await _file.readAsString());
 
-  Future<void> _writeString(String contents) => _file.writeAsString(contents);
+  Future<void> _writeString(String contents) =>
+      _file.writeAsString(contents, flush: true);
 }

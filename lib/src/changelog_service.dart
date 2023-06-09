@@ -46,6 +46,26 @@ class ChangelogService {
     await _write(log);
   }
 
+  /// Lists all versions in the changelog.
+  /// If [includeYanked] is true, yanked version will be included.
+  /// if [includeUnreleased] is true and the "Unreleased" section is not empty,
+  /// the "Unreleased" section will be prepended to the listing.
+  Future<List<String>> getAllVersions(
+      {bool includeYanked = false, bool includeUnreleased = false}) async {
+    final changelog = await _read() ?? (throw StateError('No changelog found'));
+    final versions = changelog
+        .history()
+        .where((r) => !r.isYanked || includeYanked)
+        .map((release) => release.version.toString())
+        .toList()
+        .reversed
+        .toList();
+    if (includeUnreleased && changelog.unreleased.isNotEmpty) {
+      versions.insert(0, 'Unreleased');
+    }
+    return versions;
+  }
+
   Future<String> yank(String version) async {
     final log = await _read() ?? (throw StateError('No changelog found'));
     final release = log.get(version);
@@ -64,7 +84,7 @@ class ChangelogService {
 
   /// Returns a markdown description of the given [version] or the `Unreleased`
   /// section.
-  Future<String> describe([String? version]) async {
+  Future<String> describe(String? version, {bool onlyBody = false}) async {
     final log = await _read() ?? Changelog();
     if (version == null) return printUnreleased(log.unreleased);
     return printRelease(log.get(version));
@@ -87,7 +107,7 @@ class ChangelogService {
     }
     log.add(release);
     log.unreleased.clear();
-    _write(log);
+    await _write(log);
     return describe(release.version.toString());
   }
 
@@ -101,14 +121,12 @@ class ChangelogService {
   Future<void> _write(Changelog changelog) async {
     await file.create(recursive: true);
     await file.writeAsString(
-        printChangelog(changelog, keepEmptyUnreleased: keepEmptyUnreleased));
+        printChangelog(changelog, keepEmptyUnreleased: keepEmptyUnreleased),
+        flush: true);
   }
 }
 
 extension _String on String {
-  String get capitalized =>
-      substring(0, 1).toUpperCase() + substring(1).toLowerCase();
-
   String map(Map<String, String> replacements) =>
       replacements.entries.fold(this, (s, e) => s.replaceAll(e.key, e.value));
 }

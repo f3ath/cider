@@ -34,8 +34,9 @@ class Cider {
 
   /// Returns a markdown description of the given [version] or the `Unreleased`
   /// section.
-  Future<String> describe(Context context, String? version) async =>
-      (await _changelog(context)).describe(version);
+  Future<String> describe(Context context, String? version,
+          {bool onlyBody = false}) async =>
+      (await _changelog(context)).describe(version, onlyBody: onlyBody);
 
   /// Releases the `Unreleased` section.
   /// Returns the description of the created release.
@@ -49,6 +50,15 @@ class Cider {
 
   Future<String> unyank(Context context, String version) async =>
       (await _changelog(context)).unyank(version);
+
+  /// Lists all versions in the changelog.
+  /// If [includeYanked] is true, yanked version will be included.
+  /// if [includeUnreleased] is true and the "Unreleased" section is not empty,
+  /// the "Unreleased" section will be prepended to the listing.
+  Future<List<String>> getAllVersions(Context context,
+          {bool includeYanked = false, bool includeUnreleased = false}) async =>
+      (await _changelog(context)).getAllVersions(
+          includeUnreleased: includeUnreleased, includeYanked: includeYanked);
 
   Future<ChangelogService> _changelog(Context context) async {
     final ps = _pubspec(context);

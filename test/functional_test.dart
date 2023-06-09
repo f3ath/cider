@@ -19,14 +19,14 @@ void main() {
       cli.run(['--project-root=${temp.absolute.path}', ...args]);
 
   setUp(() async {
+    out.buffer.clear();
+    err.buffer.clear();
     temp = await Directory.systemTemp.createTemp();
     await Directory('test/template').list().forEach((element) async {
       if (element is File) {
         await element.copy(path.join(temp.path, path.basename(element.path)));
       }
     });
-    out.buffer.clear();
-    err.buffer.clear();
   });
 
   tearDown(() async {
@@ -73,24 +73,36 @@ void main() {
 
 [1.0.0]: https://github.com/example/project/releases/tag/1.0.0
 ''';
-    print(err.buffer);
     expect(out.buffer.toString(), step2);
-    out.buffer.clear();
     await run(['log', 'change', 'New turbo V6 engine installed']);
     await run(['log', 'fix', 'Wheels falling off sporadically']);
-    await run(['describe']);
-    final step3 = '''
-## [Unreleased]
+    final step3Body = '''
 ### Changed
 - New turbo V6 engine installed
 
 ### Fixed
 - Wheels falling off sporadically
-
+''';
+    final step3 = '''
+## [Unreleased]
+$step3Body
 [Unreleased]: https://github.com/example/project/compare/1.0.0...HEAD
 ''';
+    out.buffer.clear();
+    await run(['describe']);
     expect(out.buffer.toString(), step3);
+
+    // TODO: implement in 0.2.1
+    // out.buffer.clear();
+    // await run(['describe', '-b']);
+    // expect(out.buffer.toString(), step3Body);
+
     await run(['bump', 'minor']);
+
+    out.buffer.clear();
+    await run(['list', '-y', '-u']);
+    expect(out.buffer.toString(), 'Unreleased\n1.0.0\n');
+
     out.buffer.clear();
     await run(['release', '--date=2021-02-03']);
     final step4 = '''
@@ -117,6 +129,19 @@ void main() {
 [1.1.0]: https://github.com/example/project/compare/1.0.0...1.1.0
 ''';
     expect(out.buffer.toString(), step5);
+
+    out.buffer.clear();
+    await run(['list']);
+    expect(out.buffer.toString(), '1.0.0\n');
+
+    out.buffer.clear();
+    await run(['list', '-y']);
+    expect(out.buffer.toString(), '1.1.0\n1.0.0\n');
+
+    out.buffer.clear();
+    await run(['list', '-y', '-u']);
+    expect(out.buffer.toString(), '1.1.0\n1.0.0\n');
+
     out.buffer.clear();
     await run(['unyank', '1.1.0']);
     expect(out.buffer.toString(), step4);

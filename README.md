@@ -70,7 +70,7 @@ Options:
 
 Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
 
-## Printing the list of changes in the given version
+### Printing the list of changes in the given version
 
 Prints the corresponding section from `CHANGELOG.md` in markdown format. This command is read-only.
 
@@ -80,6 +80,18 @@ cider describe [<version>]
 
 - **version** is an existing version from the changelog. If not specified, the `Unreleased` section will
   be used.
+
+### Listing all versions in the changelog
+
+Prints all versions from the changelog, highest to lowest.
+
+```
+cider list [options]
+```
+
+Options:
+- `--include-yanked` or `-y` - includes yanked versions.
+- `--include-unreleased` or `-u` - prints "Unreleased" in the top of the version list if there are unreleased changes.
 
 ## Version
 

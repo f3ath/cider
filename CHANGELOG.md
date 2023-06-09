@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- The &quot;list&quot; command to list all versions from the changelog
+
 ### Changed
 - Bump min SDK version to 3.0.0.
 - Exit codes changed to closer match POSIX.
