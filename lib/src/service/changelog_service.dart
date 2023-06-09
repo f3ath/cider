@@ -128,8 +128,7 @@ class ChangelogService {
   String release(DateTime date) {
     final log = read() ?? Changelog();
     final version = pubspec.readVersion()!;
-    final release = Release(version, date);
-    release.addAll(log.unreleased.changes());
+    final release = Release.fromSection(version, date, log.unreleased);
     final parent = log.preceding(release.version);
     final diffTemplate =
         pubspec.readValue('/cider/link_template/diff', orElse: () => null);
