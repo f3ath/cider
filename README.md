@@ -32,6 +32,18 @@ cider:
 
 The `%from%`, `%to%`, and `%tag%` placeholders will be replaced with the corresponding version tags.
 
+### Project root
+
+Cider may be run from the project root or from any directory within.
+In the latter case, it will try to detect the project root automatically
+by going up the filesystem tree until it finds a directory containing `pubspec.yaml`.
+
+You can override this behavior by passing the `--project-root` argument:
+
+```
+cider --project-root=/path/to/my/project version
+```
+
 ## Changelog
 
 These commands manipulate `CHANGELOG.md`.
@@ -70,7 +82,7 @@ Options:
 
 Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
 
-## Printing the list of changes in the given version
+### Printing the list of changes in the given version
 
 Prints the corresponding section from `CHANGELOG.md` in markdown format. This command is read-only.
 
@@ -80,6 +92,19 @@ cider describe [<version>]
 
 - **version** is an existing version from the changelog. If not specified, the `Unreleased` section will
   be used.
+
+### Listing all versions in the changelog
+
+Prints all versions from the changelog, highest to lowest.
+
+```
+cider list [options]
+```
+
+Options:
+
+- `--include-yanked` or `-y` - includes yanked versions.
+- `--include-unreleased` or `-u` - prints "Unreleased" in the top of the version list if there are unreleased changes.
 
 ## Version
 
@@ -112,7 +137,8 @@ Examples:
 | 0.2.1-dev      | `cider version 0.0.1-alpha+42` | 0.0.1-alpha+42 |
 
 ### Yanking/unyanking a version
-The [Changelog] defines yanked releases as version that are pulled (withdrawn) due to a serious bug or security issue. 
+
+The [Changelog] defines yanked releases as version that are pulled (withdrawn) due to a serious bug or security issue.
 According to the [Changelog], a yanked release should be marked with a `[YANKED]` tag in the changelog file.
 
 To mark a version as yanked, run the following command:
@@ -175,6 +201,17 @@ precedence.
 | 0.2.1-alpha+42 | `cider bump release`                        | 0.2.1            |
 | 0.2.1-alpha+42 | `cider bump release --keep-build`           | 0.2.1+42         |
 
+## Exit codes
+
+| Code | Meaning                                                           |
+|------|-------------------------------------------------------------------|
+| 0    | Successful exit.                                                  |
+| 64   | Usage error, e.g. invalid arguments.                              |
+| 65   | Data error, e.g. missing or invalid project files.                |
+| 70   | Software error. If you see this, you might want to open an issue. |
+
 [logo]: https://raw.githubusercontent.com/f3ath/cider/master/cider.png
+
 [semver]: https://semver.org
+
 [Changelog]: https://keepachangelog.com/en/1.1.0/
