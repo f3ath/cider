@@ -25,8 +25,8 @@ class ListCommand extends CiderCommand {
   final description = 'Lists all versions from the changelog';
 
   @override
-  Future<int> exec(Project cider) async {
-    (await cider.getAllVersions(
+  Future<int> exec(Project project) async {
+    (await project.getAllVersions(
             includeYanked: argResults![includeYanked],
             includeUnreleased: argResults![includeUnreleased]))
         .forEach(printer.out.writeln);
