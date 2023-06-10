@@ -1,7 +1,9 @@
 import 'package:cider/src/cli/command/cider_command.dart';
+import 'package:cider/src/project.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 class VersionCommand extends CiderCommand {
-  VersionCommand(super.cider, super.printer);
+  VersionCommand(super.printer);
 
   @override
   final name = 'version';
@@ -9,11 +11,12 @@ class VersionCommand extends CiderCommand {
   final description = 'Reads/writes project version';
 
   @override
-  Future<int> run() async {
+  Future<int> exec(Project project) async {
     if (argResults!.rest.isNotEmpty) {
-      await cider.setVersion(context, argResults!.rest.first);
+      final version = Version.parse(argResults!.rest.first);
+      await project.setVersion(version);
     }
-    printer.out.writeln(await cider.getVersion(context));
+    printer.out.writeln(await project.getVersion());
     return 0;
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:args/command_runner.dart';
-import 'package:cider/src/cider.dart';
 import 'package:cider/src/cli/command/bump_command.dart';
 import 'package:cider/src/cli/command/describe_command.dart';
 import 'package:cider/src/cli/command/list_command.dart';
@@ -14,17 +13,17 @@ import 'package:cider/src/cli/console.dart';
 import 'package:cider/src/cli/error_interceptor.dart';
 
 class CiderCli extends CommandRunner<int> {
-  CiderCli(Cider cider, {this.console = const Console()})
+  CiderCli({this.console = const Console()})
       : super('cider', 'Dart package maintenance tools') {
     argParser.addOption('project-root');
-    addCommand(BumpCommand(cider, console));
-    addCommand(DescribeCommand(cider, console));
-    addCommand(ListCommand(cider, console));
-    addCommand(LogCommand(cider, console));
-    addCommand(ReleaseCommand(cider, console));
-    addCommand(UnyankCommand(cider, console));
-    addCommand(VersionCommand(cider, console));
-    addCommand(YankCommand(cider, console));
+    addCommand(BumpCommand(console));
+    addCommand(DescribeCommand(console));
+    addCommand(ListCommand(console));
+    addCommand(LogCommand(console));
+    addCommand(ReleaseCommand(console));
+    addCommand(UnyankCommand(console));
+    addCommand(VersionCommand(console));
+    addCommand(YankCommand(console));
   }
 
   final Console console;

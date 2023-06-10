@@ -1,7 +1,8 @@
+import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class DescribeCommand extends CiderCommand {
-  DescribeCommand(super.cider, super.printer) {
+  DescribeCommand(super.printer) {
     argParser.addFlag(onlyBody,
         abbr: 'b',
         help: 'Print only the section body (no header)',
@@ -19,10 +20,10 @@ class DescribeCommand extends CiderCommand {
   final description = 'Print the version description';
 
   @override
-  Future<int> run() async {
+  Future<int> exec(Project project) async {
     final version = argResults!.rest.isEmpty ? null : argResults!.rest.first;
-    printer.out.writeln(await cider.describe(context, version,
-        onlyBody: argResults![onlyBody]));
+    printer.out.writeln(
+        await project.describe(version, onlyBody: argResults![onlyBody]));
     return 0;
   }
 }

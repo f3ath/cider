@@ -1,7 +1,8 @@
+import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class YankCommand extends CiderCommand {
-  YankCommand(super.cider, super.printer);
+  YankCommand(super.printer);
 
   @override
   final name = 'yank';
@@ -9,9 +10,9 @@ class YankCommand extends CiderCommand {
   final description = 'Yank a version from the changelog';
 
   @override
-  Future<int> run() async {
+  Future<int> exec(Project project) async {
     final version = argResults!.rest.first;
-    final release = await cider.yank(context, version);
+    final release = await project.setYanked(version, true);
     printer.out.writeln(release);
     return 0;
   }

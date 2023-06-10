@@ -1,7 +1,8 @@
 import 'package:cider/src/cli/command/cider_command.dart';
+import 'package:cider/src/project.dart';
 
 class LogCommand extends CiderCommand {
-  LogCommand(super.cider, super.printer);
+  LogCommand(super.printer);
 
   @override
   final name = 'log';
@@ -10,9 +11,8 @@ class LogCommand extends CiderCommand {
       'Add a new entry to the "Unreleased" section of the changelog';
 
   @override
-  Future<int> run() async {
-    await cider.addUnreleased(
-        context, argResults!.rest.first, argResults!.rest[1]);
+  Future<int> exec(Project project) async {
+    await project.addUnreleased(argResults!.rest.first, argResults!.rest[1]);
     return 0;
   }
 }

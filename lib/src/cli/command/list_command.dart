@@ -1,7 +1,8 @@
+import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class ListCommand extends CiderCommand {
-  ListCommand(super.cider, super.printer) {
+  ListCommand(super.printer) {
     argParser.addFlag(includeYanked,
         abbr: 'y',
         help: 'Include yanked versions',
@@ -24,8 +25,8 @@ class ListCommand extends CiderCommand {
   final description = 'Lists all versions from the changelog';
 
   @override
-  Future<int> run() async {
-    (await cider.getAllVersions(context,
+  Future<int> exec(Project cider) async {
+    (await cider.getAllVersions(
             includeYanked: argResults![includeYanked],
             includeUnreleased: argResults![includeUnreleased]))
         .forEach(printer.out.writeln);

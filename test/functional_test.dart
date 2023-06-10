@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cider/src/cider.dart';
 import 'package:cider/src/cli/channel.dart';
 import 'package:cider/src/cli/cider_cli.dart';
 import 'package:cider/src/cli/console.dart';
@@ -10,10 +9,9 @@ import 'package:test/test.dart';
 
 void main() {
   late Directory temp;
-  final cider = Cider();
   final out = BufferChannel();
   final err = BufferChannel();
-  final cli = CiderCli(cider, console: Console(out: out, err: err));
+  final cli = CiderCli(console: Console(out: out, err: err));
 
   Future<int> run(List<String> args) =>
       cli.run(['--project-root=${temp.absolute.path}', ...args]);

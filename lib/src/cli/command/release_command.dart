@@ -1,7 +1,8 @@
+import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class ReleaseCommand extends CiderCommand {
-  ReleaseCommand(super.cider, super.printer) {
+  ReleaseCommand(super.printer) {
     argParser.addOption('date', help: 'Release date', defaultsTo: 'today');
   }
 
@@ -11,10 +12,10 @@ class ReleaseCommand extends CiderCommand {
   final description = 'Release the unreleased changes';
 
   @override
-  Future<int> run() async {
+  Future<int> exec(Project project) async {
     final date = argResults!['date'];
     final parsedDate = date == 'today' ? DateTime.now() : DateTime.parse(date);
-    final release = await cider.release(context, parsedDate);
+    final release = await project.release(parsedDate);
     printer.out.writeln(release);
     return 0;
   }
