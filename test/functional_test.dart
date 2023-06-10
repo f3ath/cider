@@ -222,23 +222,30 @@ $step3Body
 
   group('Find Root', () {
     test('valid root', () async {
-      final code = await cider.run(['version']);
-      expect(code, Cider.exitOK);
+      final code = await cli.run(['version']);
+      expect(code, 0);
     });
 
     test('invalid root', () async {
-      Directory fsRoot = Directory.current;
+      Directory systemRoot = Directory.current;
 
-      while (!FileSystemEntity.identicalSync(fsRoot.path, fsRoot.parent.path)) {
-        fsRoot = fsRoot.parent;
+      while (!FileSystemEntity.identicalSync(
+          systemRoot.path, systemRoot.parent.path)) {
+        systemRoot = systemRoot.parent;
       }
-
-      Cider ciderAtRoot = Cider(root: fsRoot);
-      ciderAtRoot.provide<Stdout>((_) => out);
-      ciderAtRoot.provide<Stdout>((_) => err, name: 'stderr');
-      final code = await ciderAtRoot.run(['version']);
-      expect(code, Cider.exitException);
-      expect(err.buffer.toString(), contains("Can not find project root"));
+      final code = await runIn(systemRoot, () => cli.run(['version']));
+      expect(code, 70);
+      expect(err.buffer.toString(), contains('Can not find project root'));
     });
   });
+}
+
+Future<T> runIn<T>(Directory dir, Future<T> Function() f) async {
+  final current = Directory.current;
+  Directory.current = dir;
+  try {
+    return await f();
+  } finally {
+    Directory.current = current;
+  }
 }
