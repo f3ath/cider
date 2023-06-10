@@ -43,6 +43,12 @@ void main() {
     });
   });
 
+  test('Usage exception', () async {
+    final code = await run(['foo']);
+    expect(code, equals(64));
+    expect(err.buffer.toString().trim(), contains('Available commands:'));
+  });
+
   test('Can read the project version', () async {
     await cli.run(['version']);
     final expected = Pubspec.parse(await File('pubspec.yaml').readAsString())

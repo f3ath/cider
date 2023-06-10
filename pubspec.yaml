@@ -1,6 +1,6 @@
 name: cider
 version: 0.2.0-alpha.2
-description: Tools for Dart package maintainers. Automates changelog and pubspec.yaml updates.
+description: Tools for Dart package maintainers. Automates changelog and pubspec updates.
 homepage: https://github.com/f3ath/cider
 repository: https://github.com/f3ath/cider
 issue_tracker: https://github.com/f3ath/cider/issues

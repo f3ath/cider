@@ -15,7 +15,8 @@ class ErrorInterceptor {
   Future<int> run(Future<int?> Function() f) async {
     try {
       return await f() ?? exitOK;
-    } on UsageException {
+    } on UsageException catch (e) {
+      printer.err.writeln(e.usage);
       return exitUsageError;
     } on ArgumentError catch (e) {
       printer.err.writeln(e.message);

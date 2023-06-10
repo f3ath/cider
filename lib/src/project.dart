@@ -155,9 +155,10 @@ class Project {
   /// (Re)writes the changelog
   Future<void> _writeChangelog(Changelog changelog) async {
     await _changelog.create(recursive: true);
+    final rendered = printChangelog(changelog,
+        keepEmptyUnreleased: _config.keepEmptyUnreleased);
     await _changelog.writeAsString(
-        printChangelog(changelog,
-            keepEmptyUnreleased: _config.keepEmptyUnreleased),
+        rendered + (_config.changelogNewline ? '\n' : ''),
         flush: true);
   }
 }
