@@ -155,4 +155,26 @@ void main() {
       });
     });
   });
+
+  group('Find Root', () {
+    test('valid root', () async {
+      final code = await cider.run(['version']);
+      expect(code, Cider.exitOK);
+    });
+
+    test('invalid root', () async {
+      Directory fsRoot = Directory.current;
+
+      while (!FileSystemEntity.identicalSync(fsRoot.path, fsRoot.parent.path)) {
+        fsRoot = fsRoot.parent;
+      }
+
+      Cider ciderAtRoot = Cider(root: fsRoot);
+      ciderAtRoot.provide<Stdout>((_) => out);
+      ciderAtRoot.provide<Stdout>((_) => err, name: 'stderr');
+      final code = await ciderAtRoot.run(['version']);
+      expect(code, Cider.exitException);
+      expect(err.buffer.toString(), contains("Can not find project root"));
+    });
+  });
 }
