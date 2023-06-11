@@ -27,7 +27,7 @@ abstract class CiderCommand extends Command<int> {
   Future<Config> _readConfigFromPubspec(String projectRoot) async {
     final pubspec =
         loadYaml(await pubspecFile(projectRoot).readAsString()) as Map;
-    final config = pubspec.read<Map>('/cider',  orElse: () => {});
+    final config = pubspec.read<Map>('/cider', orElse: () => {});
     final diffTemplate =
         config.read<String>('/link_template/diff', orElse: () => '');
     final tagTemplate =
