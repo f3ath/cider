@@ -43,6 +43,14 @@ void main() {
     });
   });
 
+  test('Can run without config', () async {
+    final code =
+        await cli.run(['--project-root=test/template_no_config', 'version']);
+
+    expect(code, equals(0));
+    expect(out.buffer.toString(), equals('1.2.3-alpha+42\n'));
+  });
+
   test('Usage exception', () async {
     final code = await run(['foo']);
     expect(code, equals(64));
