@@ -59,64 +59,80 @@ class Project {
     return next;
   }
 
+  /// Adds a new paragraph to the preamble (the free text right after the header)
+  /// of the `Unreleased` section.
+  Future<void> addPreamble(String text) => _updateChangelog((it) {
+        it.unreleased.preamble
+            .add(Element('p', Document().parseInline(text.trim())));
+      });
+
   /// Adds a new entry to the `Unreleased` section.
   /// Type is one of `a`, `c`, `d`, `f`, `r`, `s`.
-  Future<void> addUnreleased(String type, String description) async {
-    const map = <String, String>{
-      'a': 'Added',
-      'c': 'Changed',
-      'd': 'Deprecated',
-      'f': 'Fixed',
-      'r': 'Removed',
-      's': 'Security',
-    };
-    final typeFull = map[type.substring(0, 1)]!;
-    final log = await _readChangelog();
-    final change = Change(typeFull, Document().parseInline(description));
-    log.unreleased.add(change);
-    if (_config.diffTemplate.isNotEmpty) {
-      final releases = log.history().toList();
-      if (releases.isNotEmpty) {
-        log.unreleased.link =
-            _config.diffTemplate.render(releases.last.version, 'HEAD');
-      }
-    }
-    await _writeChangelog(log);
-  }
+  Future<void> addUnreleased(String type, String description) =>
+      _updateChangelog((log) {
+        const map = <String, String>{
+          'a': 'Added',
+          'c': 'Changed',
+          'd': 'Deprecated',
+          'f': 'Fixed',
+          'r': 'Removed',
+          's': 'Security',
+        };
+        final typeFull = map[type.substring(0, 1)]!;
+        final change = Change(typeFull, Document().parseInline(description));
+        log.unreleased.add(change);
+        if (_config.diffTemplate.isNotEmpty) {
+          final releases = log.history().toList();
+          if (releases.isNotEmpty) {
+            log.unreleased.link =
+                _config.diffTemplate.render(releases.last.version, 'HEAD');
+          }
+        }
+      });
 
   /// Returns a markdown description of the given [version] or the `Unreleased`
   /// section.
   Future<String> describe(String? version, {bool onlyBody = false}) async {
     final log = await _readChangelog();
-    if (version == null) return printUnreleased(log.unreleased);
-    return printRelease(log.get(version));
+    if (version == null) {
+      final section = log.unreleased;
+      if (onlyBody) {
+        return printChanges(section);
+      }
+      return printUnreleased(section);
+    }
+    final section = log.get(version);
+    if (onlyBody) {
+      return printChanges(section);
+    }
+    return printRelease(section);
   }
 
   /// Releases the `Unreleased` section.
   /// Returns the description of the created release.
   Future<String> release(DateTime date, {Version? version}) async {
     version ??= await getVersion();
-    final log = await _readChangelog();
-    final release = Release(version, date);
-    release.addAll(log.unreleased.changes());
-    final parent = log.preceding(release.version);
-    if (parent != null && _config.diffTemplate.isNotEmpty) {
-      release.link = _config.diffTemplate.render(parent.version, version);
-    } else if (_config.tagTemplate.isNotEmpty) {
-      release.link = _config.tagTemplate.render(version);
-    }
-    log.add(release);
-    log.unreleased.clear();
-    await _writeChangelog(log);
-    return describe(release.version.toString());
+    await _updateChangelog((log) {
+      final release = Release(version!, date);
+      release.preamble.addAll(log.unreleased.preamble);
+      release.addAll(log.unreleased.changes());
+      final parent = log.preceding(release.version);
+      if (parent != null && _config.diffTemplate.isNotEmpty) {
+        release.link = _config.diffTemplate.render(parent.version, version);
+      } else if (_config.tagTemplate.isNotEmpty) {
+        release.link = _config.tagTemplate.render(version);
+      }
+      log.add(release);
+      log.unreleased.clear();
+    });
+    return describe(version.toString());
   }
 
   Future<String> setYanked(String version, bool yanked) async {
-    final log = await _readChangelog();
-    final release = log.get(version);
-    release.isYanked = yanked;
-    await _writeChangelog(log);
-    return printRelease(release);
+    await _updateChangelog((log) {
+      log.get(version).isYanked = yanked;
+    });
+    return describe(version);
   }
 
   /// Lists all versions in the changelog.
@@ -128,7 +144,7 @@ class Project {
     final changelog = await _readChangelog();
     final versions = changelog
         .history()
-        .where((r) => !r.isYanked || includeYanked)
+        .where((release) => !release.isYanked || includeYanked)
         .map((release) => release.version.toString())
         .toList()
         .reversed
@@ -143,6 +159,13 @@ class Project {
 
   Future<void> _writePubspecString(String contents) =>
       _pubspec.writeAsString(contents, flush: true);
+
+  Future<Changelog> _updateChangelog(Function(Changelog changelog) f) async {
+    final changelog = await _readChangelog();
+    f(changelog);
+    await _writeChangelog(changelog);
+    return changelog;
+  }
 
   /// Reads the project changelog
   Future<Changelog> _readChangelog() async {

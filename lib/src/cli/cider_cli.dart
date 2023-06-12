@@ -5,6 +5,7 @@ import 'package:cider/src/cli/command/bump_command.dart';
 import 'package:cider/src/cli/command/describe_command.dart';
 import 'package:cider/src/cli/command/list_command.dart';
 import 'package:cider/src/cli/command/log_command.dart';
+import 'package:cider/src/cli/command/preamble_command.dart';
 import 'package:cider/src/cli/command/release_command.dart';
 import 'package:cider/src/cli/command/unyank_command.dart';
 import 'package:cider/src/cli/command/version_command.dart';
@@ -20,6 +21,7 @@ class CiderCli extends CommandRunner<int> {
     addCommand(DescribeCommand(console));
     addCommand(ListCommand(console));
     addCommand(LogCommand(console));
+    addCommand(PreambleCommand(console));
     addCommand(ReleaseCommand(console));
     addCommand(UnyankCommand(console));
     addCommand(VersionCommand(console));

@@ -5,10 +5,8 @@ class DescribeCommand extends CiderCommand {
   DescribeCommand(super.printer) {
     argParser.addFlag(onlyBody,
         abbr: 'b',
-        help: 'Print only the section body (no header)',
+        help: 'Print only the section body (no header, no link).',
         defaultsTo: false,
-        hide: true,
-        // TODO: remove when implemented
         negatable: false);
   }
 
