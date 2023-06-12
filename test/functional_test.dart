@@ -88,7 +88,10 @@ void main() {
     expect(out.buffer.toString(), step2);
     await run(['log', 'change', 'New turbo V6 engine installed']);
     await run(['log', 'fix', 'Wheels falling off sporadically']);
+    await run(['preamble', 'I love my dog.']);
     final step3Body = '''
+I love my dog.
+
 ### Changed
 - New turbo V6 engine installed
 
@@ -118,6 +121,8 @@ $step3Body
     await run(['release', '--date=2021-02-03']);
     final step4 = '''
 ## [1.1.0] - 2021-02-03
+I love my dog.
+
 ### Changed
 - New turbo V6 engine installed
 
@@ -131,6 +136,8 @@ $step3Body
     await run(['yank', '1.1.0']);
     final step5 = '''
 ## [1.1.0] - 2021-02-03 \\[YANKED\\]
+I love my dog.
+
 ### Changed
 - New turbo V6 engine installed
 
