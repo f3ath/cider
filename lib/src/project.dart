@@ -88,8 +88,18 @@ class Project {
   /// section.
   Future<String> describe(String? version, {bool onlyBody = false}) async {
     final log = await _readChangelog();
-    if (version == null) return printUnreleased(log.unreleased);
-    return printRelease(log.get(version));
+    if (version == null) {
+      final section = log.unreleased;
+      if (onlyBody) {
+        return printChanges(section);
+      }
+      return printUnreleased(section);
+    }
+    final section = log.get(version);
+    if (onlyBody) {
+      return printChanges(section);
+    }
+    return printRelease(section);
   }
 
   /// Releases the `Unreleased` section.

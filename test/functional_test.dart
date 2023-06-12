@@ -104,10 +104,9 @@ $step3Body
     await run(['describe']);
     expect(out.buffer.toString(), step3);
 
-    // TODO: implement in 0.2.1
-    // out.buffer.clear();
-    // await run(['describe', '-b']);
-    // expect(out.buffer.toString(), step3Body);
+    out.buffer.clear();
+    await run(['describe', '-b']);
+    expect(out.buffer.toString(), step3Body);
 
     await run(['bump', 'minor']);
 

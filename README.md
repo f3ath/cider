@@ -87,11 +87,15 @@ Cider will automatically generate the diff links in the changelog if the diff li
 Prints the corresponding section from `CHANGELOG.md` in markdown format. This command is read-only.
 
 ```
-cider describe [<version>]
+cider describe [<version>] [options]
 ```
 
 - **version** is an existing version from the changelog. If not specified, the `Unreleased` section will
   be used.
+
+Options:
+
+- `--only-body` will skip the header and the link part of the changelog section.
 
 ### Listing all versions in the changelog
 
