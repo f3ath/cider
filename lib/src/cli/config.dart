@@ -1,4 +1,4 @@
-import 'package:cider/diff.dart';
+import 'package:cider/src/diff.dart';
 import 'package:cider/src/tag.dart';
 
 class Config {
