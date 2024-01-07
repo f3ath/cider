@@ -1,5 +1,5 @@
-import 'package:cider/src/diff.dart';
-import 'package:cider/src/tag.dart';
+import 'package:cider/src/template/diff.dart';
+import 'package:cider/src/template/tag.dart';
 
 class Config {
   Config(

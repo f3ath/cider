@@ -1,4 +1,4 @@
-import 'package:cider/src/template.dart';
+import 'package:cider/src/template/template.dart';
 
 final class Diff extends Template {
   const Diff(super.template);
