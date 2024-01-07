@@ -1,4 +1,4 @@
-import 'package:cider/src/template.dart';
+import 'package:cider/src/template/template.dart';
 
 final class Tag extends Template {
   const Tag(super.template);

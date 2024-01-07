@@ -33,7 +33,6 @@ class BumpCommand extends CiderCommand {
   Future<int> exec(Project project) async {
     final part = argResults!.command?.name ??
         (throw ArgumentError('Version part must be specified'));
-
     final result = await project.bumpVersion(mutations[part]!,
         keepBuild: argResults!['keep-build'],
         bumpBuild: argResults!['bump-build'],
