@@ -20,11 +20,11 @@ void main() {
     out.buffer.clear();
     err.buffer.clear();
     temp = await Directory.systemTemp.createTemp();
-    await Directory('test/template').list().forEach((element) async {
+    await for (final element in Directory('test/template').list()) {
       if (element is File) {
         await element.copy(path.join(temp.path, path.basename(element.path)));
       }
-    });
+    }
   });
 
   tearDown(() async {
