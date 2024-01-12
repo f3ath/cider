@@ -234,8 +234,9 @@ I love my dog.
       });
       test('version part must be specified', () async {
         final code = await run(['bump']);
-        expect(code, 65);
-        expect(err.buffer.toString().trim(), 'Version part must be specified');
+        expect(code, 64);
+        expect(err.buffer.toString().trim().split('\n')[0],
+            'Usage: cider bump <subcommand> [arguments]');
       });
     });
   });
