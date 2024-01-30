@@ -39,6 +39,9 @@ abstract class CiderCommand extends Command<int> {
         tagTemplate: tagTemplate,
         keepEmptyUnreleased: keepEmptyUnreleased);
   }
+
+  @override
+  printUsage() => printer.out.writeln(usage);
 }
 
 extension _Map on Map {
