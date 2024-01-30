@@ -5,13 +5,21 @@ import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:version_manipulation/mutations.dart';
 
 enum BumpType {
-  breaking,
-  major,
-  minor,
-  patch,
-  build,
-  pre,
-  release,
+  breaking(mutation: BumpBreaking(), description: 'Bump the breaking version'),
+  major(mutation: BumpMajor(), description: 'Bump the major version'),
+  minor(mutation: BumpMinor(), description: 'Bump the minor version'),
+  patch(mutation: BumpPatch(), description: 'Bump the patch version'),
+  build(mutation: BumpBuild(), description: 'Bump the build version'),
+  pre(mutation: BumpPreRelease(), description: 'Bump the pre-release version'),
+  release(mutation: Release(), description: 'Bump the release version');
+
+  const BumpType({
+    required this.mutation,
+    required this.description,
+  });
+
+  final VersionMutation mutation;
+  final String description;
 }
 
 class BumpCommand extends CiderCommand {
@@ -19,32 +27,12 @@ class BumpCommand extends CiderCommand {
     for (final type in BumpType.values) {
       addSubcommand(BumpSubCommand(
         type.name,
-        description: _subcommandDescriptions[type]!,
-        mutation: _mutations[type]!,
+        description: type.description,
+        mutation: type.mutation,
         printer: printer,
       ));
     }
   }
-
-  static const _mutations = <BumpType, VersionMutation>{
-    BumpType.breaking: BumpBreaking(),
-    BumpType.major: BumpMajor(),
-    BumpType.minor: BumpMinor(),
-    BumpType.patch: BumpPatch(),
-    BumpType.build: BumpBuild(),
-    BumpType.pre: BumpPreRelease(),
-    BumpType.release: Release(),
-  };
-
-  static const _subcommandDescriptions = <BumpType, String>{
-    BumpType.breaking: 'Bump the breaking version',
-    BumpType.major: 'Bump the major version',
-    BumpType.minor: 'Bump the minor version',
-    BumpType.patch: 'Bump the patch version',
-    BumpType.build: 'Bump the build version',
-    BumpType.pre: 'Bump the pre-release version',
-    BumpType.release: 'Bump the release version',
-  };
 
   @override
   final name = 'bump';

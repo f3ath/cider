@@ -4,12 +4,18 @@ import 'package:cider/src/cli/command/log_sub_command.dart';
 import 'package:cider/src/project.dart';
 
 enum LogType {
-  add,
-  fix,
-  change,
-  deprecate,
-  remove,
-  security,
+  add(description: 'Add a new feature to the changelog'),
+  fix(description: 'Add a new bug fix to the changelog'),
+  change(description: 'Add a new change to the changelog'),
+  deprecate(description: 'Add a new deprecation to the changelog'),
+  remove(description: 'Add a new removal to the changelog'),
+  security(description: 'Add a new security fix to the changelog');
+
+  const LogType({
+    required this.description,
+  });
+
+  final String description;
 }
 
 class LogCommand extends CiderCommand {
@@ -18,20 +24,11 @@ class LogCommand extends CiderCommand {
       addSubcommand(LogSubCommand(
         type.name,
         type: type,
-        description: _subcommandDescriptions[type]!,
+        description: type.description,
         printer: printer,
       ));
     }
   }
-
-  static const _subcommandDescriptions = <LogType, String>{
-    LogType.add: 'Add a new feature to the changelog',
-    LogType.fix: 'Add a new bug fix to the changelog',
-    LogType.change: 'Add a new change to the changelog',
-    LogType.deprecate: 'Add a new deprecation to the changelog',
-    LogType.remove: 'Add a new removal to the changelog',
-    LogType.security: 'Add a new security fix to the changelog',
-  };
 
   @override
   final name = 'log';
