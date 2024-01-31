@@ -7,6 +7,8 @@ import 'package:path/path.dart' as path;
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
 
+import 'subcommands_usage.expect.dart';
+
 void main() {
   late Directory temp;
   final out = BufferChannel();
@@ -232,11 +234,33 @@ I love my dog.
         expect(err.buffer.toString().trim(),
             'The next version must be higher than the current one.');
       });
-      test('version part must be specified', () async {
+      test('incorrect usage', () async {
         final code = await run(['bump']);
-        expect(code, 65);
-        expect(err.buffer.toString().trim(), 'Version part must be specified');
+        expect(code, 64);
+        expect(err.buffer.toString().trim().split('\n').first,
+            'Usage: cider bump <subcommand> [arguments]');
       });
+      test('help usage', () async {
+        final code = await run(['bump', '--help']);
+        expect(code, 0);
+        expect(err.buffer.toString(), isEmpty);
+        expectSubcommandsUsage(out.buffer.toString(), command: 'bump');
+      });
+    });
+  });
+
+  group('Log', () {
+    test('incorrect usage', () async {
+      final code = await run(['log']);
+      expect(code, 64);
+      expect(err.buffer.toString().trim().split('\n').first,
+          'Usage: cider log <subcommand> [arguments]');
+    });
+    test('help usage', () async {
+      final code = await run(['log', '--help']);
+      expect(code, 0);
+      expect(err.buffer.toString(), isEmpty);
+      expectSubcommandsUsage(out.buffer.toString(), command: 'log');
     });
   });
 

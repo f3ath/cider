@@ -1,28 +1,32 @@
+import 'package:args/command_runner.dart';
 import 'package:cider/src/project.dart';
+import 'package:cider/src/cli/command/bump_sub_command.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:version_manipulation/mutations.dart';
 
+enum BumpType {
+  breaking(BumpBreaking(), 'Bump the breaking version'),
+  major(BumpMajor(), 'Bump the major version'),
+  minor(BumpMinor(), 'Bump the minor version'),
+  patch(BumpPatch(), 'Bump the patch version'),
+  build(BumpBuild(), 'Bump the build version'),
+  pre(BumpPreRelease(), 'Bump the pre-release version'),
+  release(Release(), 'Bump the release version');
+
+  const BumpType(this.mutation, this.description);
+
+  final VersionMutation mutation;
+  final String description;
+}
+
 class BumpCommand extends CiderCommand {
   BumpCommand(super.printer) {
-    mutations.keys.forEach(argParser.addCommand);
-    argParser
-      ..addFlag('keep-build', help: 'Keep the existing build')
-      ..addFlag('bump-build', help: 'Also bump the build')
-      ..addOption('build',
-          help: 'Sets the build to the given value', defaultsTo: '')
-      ..addOption('pre',
-          help: 'Sets the pre-release to the given value', defaultsTo: '');
+    for (final type in BumpType.values) {
+      addSubcommand(
+        BumpSubCommand(type.name, type.description, type.mutation, printer),
+      );
+    }
   }
-
-  static const mutations = <String, VersionMutation>{
-    'breaking': BumpBreaking(),
-    'build': BumpBuild(),
-    'major': BumpMajor(),
-    'minor': BumpMinor(),
-    'patch': BumpPatch(),
-    'pre': BumpPreRelease(),
-    'release': Release(),
-  };
 
   @override
   final name = 'bump';
@@ -31,14 +35,7 @@ class BumpCommand extends CiderCommand {
 
   @override
   Future<int> exec(Project project) async {
-    final part = argResults!.command?.name ??
-        (throw ArgumentError('Version part must be specified'));
-    final result = await project.bumpVersion(mutations[part]!,
-        keepBuild: argResults!['keep-build'],
-        bumpBuild: argResults!['bump-build'],
-        build: argResults!['build'],
-        pre: argResults!['pre']);
-    printer.out.writeln(result);
-    return 0;
+    throw UsageException(
+        'Bump command can only be used with subcommands', usage);
   }
 }

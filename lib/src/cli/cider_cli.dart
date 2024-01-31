@@ -33,4 +33,7 @@ class CiderCli extends CommandRunner<int> {
   @override
   Future<int> run(Iterable<String> args) =>
       ErrorInterceptor(console).run(() => super.run(args));
+
+  @override
+  void printUsage() => console.out.writeln(usage);
 }
