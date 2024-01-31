@@ -5,18 +5,15 @@ import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:version_manipulation/mutations.dart';
 
 enum BumpType {
-  breaking(mutation: BumpBreaking(), description: 'Bump the breaking version'),
-  major(mutation: BumpMajor(), description: 'Bump the major version'),
-  minor(mutation: BumpMinor(), description: 'Bump the minor version'),
-  patch(mutation: BumpPatch(), description: 'Bump the patch version'),
-  build(mutation: BumpBuild(), description: 'Bump the build version'),
-  pre(mutation: BumpPreRelease(), description: 'Bump the pre-release version'),
-  release(mutation: Release(), description: 'Bump the release version');
+  breaking(BumpBreaking(), 'Bump the breaking version'),
+  major(BumpMajor(), 'Bump the major version'),
+  minor(BumpMinor(), 'Bump the minor version'),
+  patch(BumpPatch(), 'Bump the patch version'),
+  build(BumpBuild(), 'Bump the build version'),
+  pre(BumpPreRelease(), 'Bump the pre-release version'),
+  release(Release(), 'Bump the release version');
 
-  const BumpType({
-    required this.mutation,
-    required this.description,
-  });
+  const BumpType(this.mutation, this.description);
 
   final VersionMutation mutation;
   final String description;
@@ -25,12 +22,9 @@ enum BumpType {
 class BumpCommand extends CiderCommand {
   BumpCommand(super.printer) {
     for (final type in BumpType.values) {
-      addSubcommand(BumpSubCommand(
-        type.name,
-        description: type.description,
-        mutation: type.mutation,
-        printer: printer,
-      ));
+      addSubcommand(
+        BumpSubCommand(type.name, type.description, type.mutation, printer),
+      );
     }
   }
 
