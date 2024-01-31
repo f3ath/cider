@@ -237,7 +237,7 @@ I love my dog.
       test('incorrect usage', () async {
         final code = await run(['bump']);
         expect(code, 64);
-        expect(err.buffer.toString().trim().split('\n')[0],
+        expect(err.buffer.toString().trim().split('\n').first,
             'Usage: cider bump <subcommand> [arguments]');
       });
       test('help usage', () async {
@@ -253,7 +253,7 @@ I love my dog.
     test('incorrect usage', () async {
       final code = await run(['log']);
       expect(code, 64);
-      expect(err.buffer.toString().trim().split('\n')[0],
+      expect(err.buffer.toString().trim().split('\n').first,
           'Usage: cider log <subcommand> [arguments]');
     });
     test('help usage', () async {

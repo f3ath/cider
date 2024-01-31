@@ -21,7 +21,7 @@ class LogSubCommand extends CiderCommand {
 
   @override
   Future<int> exec(Project project) async {
-    await project.addUnreleased(type.name, argResults!.rest[0]);
+    await project.addUnreleased(type.name, argResults!.rest.first);
 
     return 0;
   }
