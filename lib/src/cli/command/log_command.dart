@@ -17,10 +17,10 @@ enum LogType {
 }
 
 class LogCommand extends CiderCommand {
-  LogCommand(super.printer) {
+  LogCommand(super.console) {
     for (final type in LogType.values) {
       addSubcommand(
-        LogSubCommand(type.name, type.description, type, printer),
+        LogSubCommand(type.name, type.description, type, console),
       );
     }
   }

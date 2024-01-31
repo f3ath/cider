@@ -4,8 +4,8 @@ import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:version_manipulation/mutations.dart';
 
 class BumpSubCommand extends CiderCommand {
-  BumpSubCommand(this.name, this.description, this.mutation, Console printer)
-      : super(printer) {
+  BumpSubCommand(this.name, this.description, this.mutation, Console console)
+      : super(console) {
     argParser
       ..addFlag('keep-build', help: 'Keep the existing build')
       ..addFlag('bump-build', help: 'Also bump the build')
@@ -30,7 +30,7 @@ class BumpSubCommand extends CiderCommand {
         bumpBuild: argResults!['bump-build'],
         build: argResults!['build'],
         pre: argResults!['pre']);
-    printer.out.writeln(result);
+    console.out.writeln(result);
 
     return 0;
   }

@@ -2,7 +2,7 @@ import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class UnyankCommand extends CiderCommand {
-  UnyankCommand(super.printer);
+  UnyankCommand(super.console);
 
   @override
   final name = 'unyank';
@@ -13,7 +13,7 @@ class UnyankCommand extends CiderCommand {
   Future<int> exec(Project project) async {
     final version = argResults!.rest.first;
     final release = await project.setYanked(version, false);
-    printer.out.writeln(release);
+    console.out.writeln(release);
     return 0;
   }
 }

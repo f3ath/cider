@@ -20,10 +20,10 @@ enum BumpType {
 }
 
 class BumpCommand extends CiderCommand {
-  BumpCommand(super.printer) {
+  BumpCommand(super.console) {
     for (final type in BumpType.values) {
       addSubcommand(
-        BumpSubCommand(type.name, type.description, type.mutation, printer),
+        BumpSubCommand(type.name, type.description, type.mutation, console),
       );
     }
   }

@@ -2,9 +2,9 @@ import 'package:args/command_runner.dart';
 import 'package:cider/src/cli/console.dart';
 
 class ErrorInterceptor {
-  ErrorInterceptor(this.printer);
+  ErrorInterceptor(this.console);
 
-  final Console printer;
+  final Console console;
 
   /// POSIX exit codes from sysexits.h
   static const exitOK = 0;
@@ -16,13 +16,13 @@ class ErrorInterceptor {
     try {
       return await f() ?? exitOK;
     } on UsageException catch (e) {
-      printer.err.writeln(e.usage);
+      console.err.writeln(e.usage);
       return exitUsageError;
     } on ArgumentError catch (e) {
-      printer.err.writeln(e.message);
+      console.err.writeln(e.message);
       return exitDataError;
     } catch (e) {
-      printer.err.writeln(e);
+      console.err.writeln(e);
       return exitSoftwareError;
     }
   }

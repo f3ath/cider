@@ -10,9 +10,9 @@ import 'package:rfc_6901/rfc_6901.dart';
 import 'package:yaml/yaml.dart';
 
 abstract class CiderCommand extends Command<int> {
-  CiderCommand(this.printer);
+  CiderCommand(this.console);
 
-  final Console printer;
+  final Console console;
 
   Future<int> exec(Project project);
 
@@ -41,7 +41,7 @@ abstract class CiderCommand extends Command<int> {
   }
 
   @override
-  printUsage() => printer.out.writeln(usage);
+  printUsage() => console.out.writeln(usage);
 }
 
 extension _Map on Map {

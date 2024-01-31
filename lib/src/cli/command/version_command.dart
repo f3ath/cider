@@ -3,7 +3,7 @@ import 'package:cider/src/project.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 class VersionCommand extends CiderCommand {
-  VersionCommand(super.printer);
+  VersionCommand(super.console);
 
   @override
   final name = 'version';
@@ -16,7 +16,7 @@ class VersionCommand extends CiderCommand {
       final version = Version.parse(argResults!.rest.first);
       await project.setVersion(version);
     }
-    printer.out.writeln(await project.getVersion());
+    console.out.writeln(await project.getVersion());
     return 0;
   }
 }

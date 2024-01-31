@@ -6,8 +6,8 @@ import 'package:test/test.dart';
 void main() {
   final out = BufferChannel();
   final err = BufferChannel();
-  final printer = Console(out: out, err: err);
-  final interceptor = ErrorInterceptor(printer);
+  final console = Console(out: out, err: err);
+  final interceptor = ErrorInterceptor(console);
 
   test('default handler prints to stderr and returns 70', () async {
     final code = await interceptor.run(() => throw 'Foo');
