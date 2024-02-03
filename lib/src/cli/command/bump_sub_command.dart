@@ -35,4 +35,3 @@ class BumpSubCommand extends CiderCommand {
     return 0;
   }
 }
-
