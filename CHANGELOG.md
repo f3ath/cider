@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2024-02-03
+### Fixed
+- Made `bump` and `log` proper subcommands to improve UX ([PR](https://github.com/f3ath/cider/pull/70) by [marvin-kolja](https://github.com/marvin-kolja))
+
 ## [0.2.5] - 2024-01-07
 ### Changed
 - Bump dependencies
@@ -112,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial version
 
+[0.2.6]: https://github.com/f3ath/cider/compare/0.2.5...0.2.6
 [0.2.5]: https://github.com/f3ath/cider/compare/0.2.4...0.2.5
 [0.2.4]: https://github.com/f3ath/cider/compare/0.2.3...0.2.4
 [0.2.3]: https://github.com/f3ath/cider/compare/0.2.2...0.2.3

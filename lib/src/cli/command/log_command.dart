@@ -3,19 +3,6 @@ import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:cider/src/cli/command/log_sub_command.dart';
 import 'package:cider/src/project.dart';
 
-enum LogType {
-  fix('Add a new bug fix to the changelog'),
-  add('Add a new feature to the changelog'),
-  change('Add a new change to the changelog'),
-  deprecate('Add a new deprecation to the changelog'),
-  remove('Add a new removal to the changelog'),
-  security('Add a new security fix to the changelog');
-
-  const LogType(this.description);
-
-  final String description;
-}
-
 class LogCommand extends CiderCommand {
   LogCommand(super.console) {
     for (final type in LogType.values) {
@@ -36,4 +23,17 @@ class LogCommand extends CiderCommand {
     throw UsageException(
         'Log command can only be used with subcommands', usage);
   }
+}
+
+enum LogType {
+  fix('Add a new bug fix to the changelog'),
+  add('Add a new feature to the changelog'),
+  change('Add a new change to the changelog'),
+  deprecate('Add a new deprecation to the changelog'),
+  remove('Add a new removal to the changelog'),
+  security('Add a new security fix to the changelog');
+
+  const LogType(this.description);
+
+  final String description;
 }
