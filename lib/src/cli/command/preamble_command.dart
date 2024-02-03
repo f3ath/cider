@@ -2,7 +2,7 @@ import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:cider/src/project.dart';
 
 class PreambleCommand extends CiderCommand {
-  PreambleCommand(super.printer);
+  PreambleCommand(super.console);
 
   @override
   final name = 'preamble';

@@ -4,8 +4,8 @@ import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class LogSubCommand extends CiderCommand {
-  LogSubCommand(this.name, this.description, this.type, Console printer)
-      : super(printer);
+  LogSubCommand(this.name, this.description, this.type, Console console)
+      : super(console);
 
   @override
   final String name;

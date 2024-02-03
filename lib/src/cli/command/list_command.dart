@@ -2,7 +2,7 @@ import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
 
 class ListCommand extends CiderCommand {
-  ListCommand(super.printer) {
+  ListCommand(super.console) {
     argParser.addFlag(includeYanked,
         abbr: 'y',
         help: 'Include yanked versions',
@@ -29,7 +29,7 @@ class ListCommand extends CiderCommand {
     (await project.getAllVersions(
             includeYanked: argResults![includeYanked],
             includeUnreleased: argResults![includeUnreleased]))
-        .forEach(printer.out.writeln);
+        .forEach(console.out.writeln);
     return 0;
   }
 }
