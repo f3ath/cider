@@ -68,7 +68,7 @@ void main() {
   });
 
   test('Full release cycle', () async {
-    final code = await run(['log', 'add', 'Initial release']);
+    final code = await run(['log', 'a', 'Initial release']); // prefix must work
     expect(code, 0);
     await run(['describe']);
     final step1 = '''
@@ -88,7 +88,7 @@ void main() {
 [1.0.0]: https://github.com/example/project/releases/tag/1.0.0
 ''';
     expect(out.buffer.toString(), step2);
-    await run(['log', 'change', 'New turbo V6 engine installed']);
+    await run(['log', 'changed', 'New turbo V6 engine installed']);
     await run(['log', 'fix', 'Wheels falling off sporadically']);
     await run(['preamble', 'I love my dog.']);
     final step3Body = '''
