@@ -26,11 +26,11 @@ class LogCommand extends CiderCommand {
 }
 
 enum LogType {
-  fix('Add a new bug fix to the changelog'),
-  add('Add a new feature to the changelog'),
-  change('Add a new change to the changelog'),
-  deprecate('Add a new deprecation to the changelog'),
-  remove('Add a new removal to the changelog'),
+  fixed('Add a new bug fix to the changelog'),
+  added('Add a new feature to the changelog'),
+  changed('Add a new change to the changelog'),
+  deprecated('Add a new deprecation to the changelog'),
+  removed('Add a new removal to the changelog'),
   security('Add a new security fix to the changelog');
 
   const LogType(this.description);
