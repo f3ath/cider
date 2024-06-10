@@ -17,15 +17,17 @@ class CiderCli extends CommandRunner<int> {
   CiderCli({this.console = const Console()})
       : super('cider', 'Dart package maintenance tools') {
     argParser.addOption('project-root');
-    addCommand(BumpCommand(console));
-    addCommand(DescribeCommand(console));
-    addCommand(ListCommand(console));
-    addCommand(LogCommand(console));
-    addCommand(PreambleCommand(console));
-    addCommand(ReleaseCommand(console));
-    addCommand(UnyankCommand(console));
-    addCommand(VersionCommand(console));
-    addCommand(YankCommand(console));
+    [
+      BumpCommand(console),
+      DescribeCommand(console),
+      ListCommand(console),
+      LogCommand(console),
+      PreambleCommand(console),
+      ReleaseCommand(console),
+      UnyankCommand(console),
+      VersionCommand(console),
+      YankCommand(console),
+    ].forEach(addCommand);
   }
 
   final Console console;

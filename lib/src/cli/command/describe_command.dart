@@ -1,5 +1,5 @@
-import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
+import 'package:cider/src/project.dart';
 
 class DescribeCommand extends CiderCommand {
   DescribeCommand(super.console) {
