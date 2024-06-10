@@ -7,8 +7,6 @@ import 'package:path/path.dart' as path;
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
 
-import 'subcommands_usage.expect.dart';
-
 void main() {
   late Directory temp;
   final out = BufferChannel();
@@ -292,4 +290,13 @@ Future<T> runIn<T>(Directory dir, Future<T> Function() f) async {
   } finally {
     Directory.current = current;
   }
+}
+
+void expectSubcommandsUsage(String output, {String? command}) {
+  if (command != null) {
+    expect(output, contains('Usage: cider $command <subcommand> [arguments]'));
+  }
+  expect(output, contains('-h, --help    Print this usage information.'));
+  expect(output, contains('Available subcommands:'));
+  expect(output, contains('Run "cider help" to see global options.'));
 }

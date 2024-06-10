@@ -19,7 +19,7 @@ abstract class CiderCommand extends Command<int> {
   @override
   Future<int> run() async {
     final projectRoot = globalResults!['project-root'] ??
-        findProjectRoot(Directory.current).absolute.path;
+        (await findProjectRoot(Directory.current)).absolute.path;
     final config = await _readConfigFromPubspec(projectRoot);
     return await exec(Project(projectRoot, config));
   }

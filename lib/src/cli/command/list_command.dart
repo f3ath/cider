@@ -1,5 +1,5 @@
-import 'package:cider/src/project.dart';
 import 'package:cider/src/cli/command/cider_command.dart';
+import 'package:cider/src/project.dart';
 
 class ListCommand extends CiderCommand {
   ListCommand(super.console) {
@@ -26,10 +26,11 @@ class ListCommand extends CiderCommand {
 
   @override
   Future<int> exec(Project project) async {
-    (await project.getAllVersions(
-            includeYanked: argResults![includeYanked],
-            includeUnreleased: argResults![includeUnreleased]))
-        .forEach(console.out.writeln);
+    final versions = await project.getAllVersions(
+      includeYanked: argResults![includeYanked],
+      includeUnreleased: argResults![includeUnreleased],
+    );
+    versions.forEach(console.out.writeln);
     return 0;
   }
 }
