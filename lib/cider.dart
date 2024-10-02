@@ -1,4 +1,4 @@
-library cider;
+library;
 
 export 'package:cider/src/project.dart';
 export 'package:cider/src/cli/cider_cli.dart';
