@@ -1,5 +1,5 @@
 name: cider
-version: 0.2.8
+version: 0.2.9
 description: Automatically increments, sets, prints the package version in pubspec.yaml. Adds, lists, prints entries in the changelog. Creates diff links in the changelog.
 homepage: https://github.com/f3ath/cider
 repository: https://github.com/f3ath/cider
