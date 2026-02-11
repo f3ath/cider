@@ -1,0 +1,9 @@
+name: test
+version: 1.1.0
+description: Test project
+
+cider:
+  tag_prefix: v
+  link_template:
+    diff: https://github.com/example/project/compare/%from%...%to%
+    tag: https://github.com/example/project/releases/tag/%tag%

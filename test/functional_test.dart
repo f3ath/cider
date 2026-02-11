@@ -7,8 +7,10 @@ import 'package:path/path.dart' as path;
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
 
+Directory? _temp;
+Directory get temp => _temp!;
+
 void main() {
-  late Directory temp;
   final out = BufferChannel();
   final err = BufferChannel();
   final cli = CiderCli(console: Console(out: out, err: err));
@@ -16,15 +18,24 @@ void main() {
   Future<int> run(List<String> args) =>
       cli.run(['--project-root=${temp.absolute.path}', ...args]);
 
-  setUp(() async {
-    out.buffer.clear();
-    err.buffer.clear();
-    temp = await Directory.systemTemp.createTemp();
-    await for (final element in Directory('test/template').list()) {
+  Future<void> setupTempDir({required String projectRoot}) async {
+    // Delete previous temp dir
+    if (_temp != null && await temp.exists()) {
+      await temp.delete(recursive: true);
+    }
+
+    _temp = await Directory.systemTemp.createTemp();
+    await for (final element in Directory(projectRoot).list()) {
       if (element is File) {
         await element.copy(path.join(temp.path, path.basename(element.path)));
       }
     }
+  }
+
+  setUp(() async {
+    out.buffer.clear();
+    err.buffer.clear();
+    await setupTempDir(projectRoot: 'test/template');
   });
 
   tearDown(() async {
@@ -279,6 +290,111 @@ I love my dog.
       expect(code, 70);
       expect(err.buffer.toString(), contains('Can not find project root'));
     });
+  });
+
+  test('Tag prefix', () async {
+    // Use a config that defined a tag prefix
+    // URLs should include the prefix
+    await setupTempDir(projectRoot: 'test/template_with_tag_prefix');
+
+    final code = await run(['log', 'a', 'Initial release']); // prefix must work
+    expect(code, 0);
+    await run(['describe']);
+    final step1 = '''
+## Unreleased
+### Added
+- Initial release
+''';
+    expect(out.buffer.toString(), step1);
+    await run(['version', '1.0.0']);
+    out.buffer.clear();
+    await run(['release', '--date=2020-01-02']);
+    final step2 = '''
+## [1.0.0] - 2020-01-02
+### Added
+- Initial release
+
+[1.0.0]: https://github.com/example/project/releases/tag/v1.0.0
+''';
+    expect(out.buffer.toString(), step2);
+    await run(['log', 'changed', 'New turbo V6 engine installed']);
+    await run(['log', 'fix', 'Wheels falling off sporadically']);
+    await run(['preamble', 'I love my dog.']);
+    final step3Body = '''
+I love my dog.
+
+### Changed
+- New turbo V6 engine installed
+
+### Fixed
+- Wheels falling off sporadically
+''';
+    final step3 = '''
+## [Unreleased]
+$step3Body
+[Unreleased]: https://github.com/example/project/compare/v1.0.0...HEAD
+''';
+    out.buffer.clear();
+    await run(['describe']);
+    expect(out.buffer.toString(), step3);
+
+    out.buffer.clear();
+    await run(['describe', '-b']);
+    expect(out.buffer.toString(), step3Body);
+
+    await run(['bump', 'minor']);
+
+    out.buffer.clear();
+    await run(['list', '-y', '-u']);
+    expect(out.buffer.toString(), 'Unreleased\n1.0.0\n');
+
+    out.buffer.clear();
+    await run(['release', '--date=2021-02-03']);
+    final step4 = '''
+## [1.1.0] - 2021-02-03
+I love my dog.
+
+### Changed
+- New turbo V6 engine installed
+
+### Fixed
+- Wheels falling off sporadically
+
+[1.1.0]: https://github.com/example/project/compare/v1.0.0...v1.1.0
+''';
+    expect(out.buffer.toString(), step4);
+    out.buffer.clear();
+    await run(['yank', '1.1.0']);
+    final step5 = '''
+## [1.1.0] - 2021-02-03 \\[YANKED\\]
+I love my dog.
+
+### Changed
+- New turbo V6 engine installed
+
+### Fixed
+- Wheels falling off sporadically
+
+[1.1.0]: https://github.com/example/project/compare/v1.0.0...v1.1.0
+''';
+    expect(out.buffer.toString(), step5);
+
+    out.buffer.clear();
+    await run(['list']);
+    expect(out.buffer.toString(), '1.0.0\n');
+
+    out.buffer.clear();
+    await run(['list', '-y']);
+    expect(out.buffer.toString(), '1.1.0\n1.0.0\n');
+
+    out.buffer.clear();
+    await run(['list', '-y', '-u']);
+    expect(out.buffer.toString(), '1.1.0\n1.0.0\n');
+
+    out.buffer.clear();
+    await run(['unyank', '1.1.0']);
+    expect(out.buffer.toString(), step4);
+    expect(err.buffer.toString(), isEmpty);
   });
 }
 
