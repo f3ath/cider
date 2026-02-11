@@ -5,7 +5,7 @@ class Config {
   Config(
       {String diffTemplate = '',
       String tagTemplate = '',
-      this.tagPrefix = '',
+      this.templateTagPrefix = '',
       this.keepEmptyUnreleased = false,
       this.changelogNewline = true})
       : diffTemplate = Diff(diffTemplate),
@@ -15,5 +15,5 @@ class Config {
   final Tag tagTemplate;
   final bool keepEmptyUnreleased;
   final bool changelogNewline;
-  final String tagPrefix;
+  final String templateTagPrefix;
 }

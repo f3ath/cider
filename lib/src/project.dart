@@ -84,10 +84,10 @@ class Project {
         if (_config.diffTemplate.isNotEmpty) {
           final releases = log.history().toList();
           if (releases.isNotEmpty) {
-            final lastVersionTag =
-                _config.tagPrefix + releases.last.version.toString();
-            log.unreleased.link =
-                _config.diffTemplate.render(lastVersionTag, 'HEAD');
+            log.unreleased.link = _config.diffTemplate.render(
+              buildVersionForTemplate(releases.last.version),
+              'HEAD',
+            );
           }
         }
       });
@@ -119,14 +119,15 @@ class Project {
       release.preamble.addAll(log.unreleased.preamble);
       release.addAll(log.unreleased.changes());
       final parent = log.preceding(release.version);
-      final taggedVersion = _config.tagPrefix + release.version.toString();
       if (parent != null && _config.diffTemplate.isNotEmpty) {
-        final parentTaggedVersion =
-            _config.tagPrefix + parent.version.toString();
-        release.link =
-            _config.diffTemplate.render(parentTaggedVersion, taggedVersion);
+        release.link = _config.diffTemplate.render(
+          buildVersionForTemplate(parent.version),
+          buildVersionForTemplate(release.version),
+        );
       } else if (_config.tagTemplate.isNotEmpty) {
-        release.link = _config.tagTemplate.render(taggedVersion);
+        release.link = _config.tagTemplate.render(
+          buildVersionForTemplate(release.version),
+        );
       }
       log.add(release);
       log.unreleased.clear();
@@ -189,5 +190,9 @@ class Project {
     await _changelog.writeAsString(
         rendered + (_config.changelogNewline ? '\n' : ''),
         flush: true);
+  }
+
+  String buildVersionForTemplate(Version version) {
+    return _config.templateTagPrefix + version.toString();
   }
 }
