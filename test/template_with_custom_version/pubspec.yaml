@@ -6,4 +6,4 @@ cider:
   link_template:
     diff: https://github.com/example/project/compare/%from%...%to%
     tag: https://github.com/example/project/releases/tag/%tag%
-    tag_prefix: v
+    version: v%version%

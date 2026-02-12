@@ -193,6 +193,10 @@ class Project {
   }
 
   String buildVersionForTemplate(Version version) {
-    return _config.templateTagPrefix + version.toString();
+    // Use a custom version naming convention if provided. For example, versions could start
+    // with "v" in Git tags.
+    return _config.versionTemplate.isNotEmpty
+        ? _config.versionTemplate.render(version)
+        : version.toString();
   }
 }

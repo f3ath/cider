@@ -292,10 +292,11 @@ I love my dog.
     });
   });
 
-  test('Tag prefix', () async {
-    // Use a config that defined a tag prefix
-    // URLs should include the prefix
-    await setupTempDir(projectRoot: 'test/template_with_tag_prefix');
+  test('Version template', () async {
+    // Use a config that defined a version template
+    // URLs should be modified accordingly
+    // This template prepends "v" to the version numbers
+    await setupTempDir(projectRoot: 'test/template_with_custom_version');
 
     final code = await run(['log', 'a', 'Initial release']); // prefix must work
     expect(code, 0);
