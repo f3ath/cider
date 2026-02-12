@@ -84,8 +84,10 @@ class Project {
         if (_config.diffTemplate.isNotEmpty) {
           final releases = log.history().toList();
           if (releases.isNotEmpty) {
-            log.unreleased.link =
-                _config.diffTemplate.render(releases.last.version, 'HEAD');
+            log.unreleased.link = _config.diffTemplate.render(
+              buildVersionForTemplate(releases.last.version),
+              'HEAD',
+            );
           }
         }
       });
@@ -118,9 +120,14 @@ class Project {
       release.addAll(log.unreleased.changes());
       final parent = log.preceding(release.version);
       if (parent != null && _config.diffTemplate.isNotEmpty) {
-        release.link = _config.diffTemplate.render(parent.version, version);
+        release.link = _config.diffTemplate.render(
+          buildVersionForTemplate(parent.version),
+          buildVersionForTemplate(release.version),
+        );
       } else if (_config.tagTemplate.isNotEmpty) {
-        release.link = _config.tagTemplate.render(version);
+        release.link = _config.tagTemplate.render(
+          buildVersionForTemplate(release.version),
+        );
       }
       log.add(release);
       log.unreleased.clear();
@@ -183,5 +190,13 @@ class Project {
     await _changelog.writeAsString(
         rendered + (_config.changelogNewline ? '\n' : ''),
         flush: true);
+  }
+
+  String buildVersionForTemplate(Version version) {
+    // Use a custom version naming convention if provided. For example, versions could start
+    // with "v" in Git tags.
+    return _config.versionTemplate.isNotEmpty
+        ? _config.versionTemplate.render(version)
+        : version.toString();
   }
 }
