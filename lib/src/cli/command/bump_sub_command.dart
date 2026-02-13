@@ -1,6 +1,6 @@
+import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:cider/src/cli/console.dart';
 import 'package:cider/src/project.dart';
-import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:version_manipulation/mutations.dart';
 
 class BumpSubCommand extends CiderCommand {

@@ -1,7 +1,7 @@
+import 'package:cider/src/cli/command/cider_command.dart';
 import 'package:cider/src/cli/command/log_command.dart';
 import 'package:cider/src/cli/console.dart';
 import 'package:cider/src/project.dart';
-import 'package:cider/src/cli/command/cider_command.dart';
 
 class LogSubCommand extends CiderCommand {
   LogSubCommand(this.name, this.description, this.type, Console console)

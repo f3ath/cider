@@ -11,7 +11,7 @@ Future<Directory> findProjectRoot(Directory dir) async {
   return await findProjectRoot(dir.parent);
 }
 
-extension _DirectoryExt on Directory {
+extension on Directory {
   Future<bool> isRoot() =>
       FileSystemEntity.identical(this.absolute.path, parent.absolute.path);
 }

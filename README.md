@@ -1,221 +1,198 @@
 ![logo]
 
-# Cider (CI for Dart. Efficient Release)
+# Cider (CI for Dart: Efficient Release)
 
-A command-line utility to automate package maintenance. Manipulates the changelog and pubspec.yaml.
+Cider is a CLI tool for Dart package maintenance. It updates `CHANGELOG.md` and `pubspec.yaml` to help automate releases.
 
-This tool assumes that the changelog:
+## Assumptions
 
-- is called `CHANGELOG.md`
-- is sitting in the project root folder
-- strictly follows the [Changelog] format
-- uses basic markdown (no HTML and complex formatting supported)
+Cider expects:
 
-It also assumes that your project follows [Semantic Versioning v2.0.0](https://semver.org/spec/v2.0.0.html).
+- a `CHANGELOG.md` file in the project root
+- changelog format compatible with [Keep a Changelog][Changelog]
+- simple Markdown in changelog entries (no HTML or complex formatting)
+- project versions that follow [Semantic Versioning 2.0.0][semver]
 
-## Install
+## Installation
 
+```bash
+dart pub global activate cider
 ```
-pub global activate cider
-```
 
-## Configure
+## Configuration
 
-Cider configuration is stored in `pubspec.yaml` under the key `cider`:
+Configure Cider in `pubspec.yaml` under `cider`:
 
 ```yaml
 cider:
   link_template:
-    tag: https://github.com/example/project/releases/tag/%tag% # initial release link template
-    diff: https://github.com/example/project/compare/%from%...%to% # subsequent releases link template
+    tag: https://github.com/example/project/releases/tag/%tag%
+    diff: https://github.com/example/project/compare/%from%...%to%
+    version: v%version% # default: %version%
 ```
 
-The `%from%`, `%to%`, and `%tag%` placeholders will be replaced with the corresponding version tags.
+Placeholders:
 
-### Project root
+- `%from%` - previous version tag
+- `%to%` - current version tag
+- `%tag%` - release tag
 
-Cider may be run from the project root or from any directory within.
-In the latter case, it will try to detect the project root automatically
-by going up the filesystem tree until it finds a directory containing `pubspec.yaml`.
+## Project root detection
 
-You can override this behavior by passing the `--project-root` argument:
+You can run Cider from any subdirectory. It searches upward for `pubspec.yaml`.
 
+To override auto-detection:
+
+```bash
+cider --project-root=/path/to/project version
 ```
-cider --project-root=/path/to/my/project version
-```
 
-## Changelog
+## Changelog commands
 
-These commands manipulate `CHANGELOG.md`.
+These commands modify `CHANGELOG.md` unless stated otherwise.
 
-### Adding changes
+### Add an entry
 
-Adds a new line to the `Unreleased` section of the changelog
-
-```
+```bash
 cider log <type> <description>
 ```
 
-- **type** is one of: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`
-- **description** is a markdown text line
+- `<type>`: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`
+- `<description>`: one Markdown line
 
 Examples:
 
-```
-cider log changed 'New turbo V6 engine installed'
-cider log added 'Support for rocket fuel and kerosene'
-cider log fixed 'Wheels falling off sporadically'
+```bash
+cider log changed 'Improve parser performance'
+cider log added 'Support workspace mode'
+cider log fixed 'Null pointer in changelog parser'
 ```
 
-### Releasing the unreleased changes
+### Release `Unreleased` entries
 
-Takes all changes from the `Unreleased` section on the changelog and creates a new release under the current version in
-pubspec.yaml
-
-```
+```bash
 cider release [options]
 ```
 
 Options:
 
-- `--date` to provide the release date (the default is today).
+- `--date` - release date (default: today)
 
-Cider will automatically generate the diff links in the changelog if the diff link template is found in the config.
+If `link_template.diff` is configured, Cider generates changelog diff links automatically.
 
-### Printing the list of changes in the given version
+### Print changes for a version (read-only)
 
-Prints the corresponding section from `CHANGELOG.md` in markdown format. This command is read-only.
-
-```
+```bash
 cider describe [<version>] [options]
 ```
 
-- **version** is an existing version from the changelog. If not specified, the `Unreleased` section will
-  be used.
+- `<version>` defaults to `Unreleased` if omitted
 
 Options:
 
-- `--only-body` will skip the header and the link part of the changelog section.
+- `--only-body` - omit section header and link footer
 
-### Listing all versions in the changelog
+### List versions
 
-Prints all versions from the changelog, highest to lowest.
-
-```
+```bash
 cider list [options]
 ```
 
 Options:
 
-- `--include-yanked` or `-y` - includes yanked versions.
-- `--include-unreleased` or `-u` - prints "Unreleased" in the top of the version list if there are unreleased changes.
+- `--include-yanked`, `-y`
+- `--include-unreleased`, `-u`
 
-## Version
+## Version commands
 
-These commands affect the `version` line in `pubspec.yaml`. If applied successfully, Cider will print the resulting
-version.
+These commands operate on `version` in `pubspec.yaml`.
 
-### Printing the current project version
+### Print current version (read-only)
 
-Prints the current version from `pubspec.yaml`. This command is read-only.
-
-```
+```bash
 cider version
 ```
 
-### Setting version to an arbitrary value
+### Set version
 
-Sets the version in `pubspec.yaml` to the one provided. The new version must be [semver]-compatible.
-
-```
+```bash
 cider version <new_version>
 ```
 
-- **new_version** new value, must be [semver]-compatible
+`<new_version>` must be [SemVer][semver]-compatible.
 
 Examples:
 
-| Version before | Command                        | Version after  |
-|----------------|--------------------------------|----------------|
-| 1.2.3+1        | `cider version 3.2.1`          | 3.2.1          |
-| 0.2.1-dev      | `cider version 0.0.1-alpha+42` | 0.0.1-alpha+42 |
+| Before   | Command                           | After          |
+|----------|-----------------------------------|----------------|
+| 1.2.3+1  | `cider version 3.2.1`             | 3.2.1          |
+| 0.2.1-dev| `cider version 0.0.1-alpha+42`    | 0.0.1-alpha+42 |
 
-### Yanking/unyanking a version
+### Yank / unyank a release in changelog
 
-The [Changelog] defines yanked releases as version that are pulled (withdrawn) due to a serious bug or security issue.
-According to the [Changelog], a yanked release should be marked with a `[YANKED]` tag in the changelog file.
-
-To mark a version as yanked, run the following command:
-
-```
+```bash
 cider yank <version>
-```
-
-To unyank a version, run the following command:
-
-```
 cider unyank <version>
 ```
 
-### Bumping the project version
+Yanked versions are marked as `[YANKED]` in `CHANGELOG.md`.
 
-Bumps the corresponding part of the project version according to [semver].
+### Bump version
 
-```
+```bash
 cider bump <part> [options]
 ```
 
-- **part** can be any of the following:
-    - `breaking` (means `y` for `0.y.z` and `x` for `x.y.z`)
-    - `major`
-    - `minor`
-    - `patch`
-    - `build`
-    - `pre` (pre-release)
-    - `release` (promotes the version to a release, removing the pre-release part)
+`<part>` can be:
+
+- `breaking` (`y` for `0.y.z`, otherwise `x` for `x.y.z`)
+- `major`
+- `minor`
+- `patch`
+- `build`
+- `pre` (pre-release)
+- `release` (remove pre-release suffix)
 
 Options:
 
-- `--keep-build` will retain the existing build part.
-- `--bump-build` will increment the build part (see below).
-- `--build=<value>` will set the build part to the given value. This is useful when build is a not a simple numeric
-  value, e.g. a timestamp.
-- `--pre=<prefix>` sets the prerelease prefix.
+- `--keep-build` - keep existing build metadata
+- `--bump-build` - increment build metadata
+- `--build=<value>` - set build metadata explicitly
+- `--pre=<prefix>` - set pre-release prefix
 
-When bumping the `prerelease` or `build` parts, Cider will look for the rightmost dot-separated identifier. If the
-identifier is an integer, it will be incremented stripping the leading zeroes. Otherwise, Cider will append `.1` to the
-corresponding part.
+Notes:
 
-Remember that according to [semver] v2, `build` is considered metadata and is ignored when determining version
-precedence.
+- For `pre` and `build`, Cider increments the rightmost dot-separated numeric identifier.
+- If no numeric identifier exists, Cider appends `.1`.
+- Per SemVer, build metadata does not affect version precedence.
 
-| Version before | Command                                     | Version after    |
-|----------------|---------------------------------------------|------------------|
-| 1.2.1-alpha+42 | `cider bump breaking`                       | 2.0.0            |
-| 0.2.1-alpha+42 | `cider bump breaking`                       | 0.3.0            |
-| 0.2.1-alpha+42 | `cider bump major`                          | 1.0.0            |
-| 0.2.1-alpha+42 | `cider bump minor`                          | 0.3.0            |
-| 0.2.1-alpha+42 | `cider bump patch`                          | 0.2.1            |
-| 0.2.1          | `cider bump patch`                          | 0.2.2            |
-| 0.2.1-alpha+42 | `cider bump pre`                            | 0.2.1-alpha.1    |
-| 1.2.1-alpha+42 | `cider bump breaking --keep-build`          | 2.0.0+42         |
-| 0.2.1-alpha+42 | `cider bump breaking --bump-build`          | 0.3.0+43         |
-| 0.2.1-alpha+42 | `cider bump major --build=2020-02-02`       | 1.0.0+2020-02-02 |
-| 0.2.1-alpha+42 | `cider bump minor --pre=alpha --bump-build` | 0.3.0-alpha+43   |
-| 0.2.1-alpha+42 | `cider bump release`                        | 0.2.1            |
-| 0.2.1-alpha+42 | `cider bump release --keep-build`           | 0.2.1+42         |
+Examples:
+
+| Before           | Command                                     | After            |
+|------------------|---------------------------------------------|------------------|
+| 1.2.1-alpha+42   | `cider bump breaking`                       | 2.0.0            |
+| 0.2.1-alpha+42   | `cider bump breaking`                       | 0.3.0            |
+| 0.2.1-alpha+42   | `cider bump major`                          | 1.0.0            |
+| 0.2.1-alpha+42   | `cider bump minor`                          | 0.3.0            |
+| 0.2.1-alpha+42   | `cider bump patch`                          | 0.2.1            |
+| 0.2.1            | `cider bump patch`                          | 0.2.2            |
+| 0.2.1-alpha+42   | `cider bump pre`                            | 0.2.1-alpha.1    |
+| 1.2.1-alpha+42   | `cider bump breaking --keep-build`          | 2.0.0+42         |
+| 0.2.1-alpha+42   | `cider bump breaking --bump-build`          | 0.3.0+43         |
+| 0.2.1-alpha+42   | `cider bump major --build=2020-02-02`       | 1.0.0+2020-02-02 |
+| 0.2.1-alpha+42   | `cider bump minor --pre=alpha --bump-build` | 0.3.0-alpha+43   |
+| 0.2.1-alpha+42   | `cider bump release`                        | 0.2.1            |
+| 0.2.1-alpha+42   | `cider bump release --keep-build`           | 0.2.1+42         |
 
 ## Exit codes
 
-| Code | Meaning                                                           |
-|------|-------------------------------------------------------------------|
-| 0    | Successful exit.                                                  |
-| 64   | Usage error, e.g. invalid arguments.                              |
-| 65   | Data error, e.g. missing or invalid project files.                |
-| 70   | Software error. If you see this, you might want to open an issue. |
+| Code | Meaning |
+|------|---------|
+| 0    | Success |
+| 64   | Usage error (invalid arguments) |
+| 65   | Data error (missing/invalid project files) |
+| 70   | Internal software error (consider opening an issue) |
 
 [logo]: https://raw.githubusercontent.com/f3ath/cider/master/cider.png
-
 [semver]: https://semver.org
-
 [Changelog]: https://keepachangelog.com/en/1.1.0/
