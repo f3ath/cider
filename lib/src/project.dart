@@ -85,7 +85,7 @@ class Project {
           final releases = log.history().toList();
           if (releases.isNotEmpty) {
             log.unreleased.link = _config.diffTemplate.render(
-              buildVersionForTemplate(releases.last.version),
+              _renderVersion(releases.last.version),
               'HEAD',
             );
           }
@@ -121,12 +121,12 @@ class Project {
       final parent = log.preceding(release.version);
       if (parent != null && _config.diffTemplate.isNotEmpty) {
         release.link = _config.diffTemplate.render(
-          buildVersionForTemplate(parent.version),
-          buildVersionForTemplate(release.version),
+          _renderVersion(parent.version),
+          _renderVersion(release.version),
         );
       } else if (_config.tagTemplate.isNotEmpty) {
         release.link = _config.tagTemplate.render(
-          buildVersionForTemplate(release.version),
+          _renderVersion(release.version),
         );
       }
       log.add(release);
@@ -192,11 +192,6 @@ class Project {
         flush: true);
   }
 
-  String buildVersionForTemplate(Version version) {
-    // Use a custom version naming convention if provided. For example, versions could start
-    // with "v" in Git tags.
-    return _config.versionTemplate.isNotEmpty
-        ? _config.versionTemplate.render(version)
-        : version.toString();
-  }
+  String _renderVersion(Version version) =>
+      _config.versionTemplate.render(version);
 }

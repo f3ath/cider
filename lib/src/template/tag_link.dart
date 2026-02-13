@@ -1,7 +1,7 @@
 import 'package:cider/src/template/template.dart';
 
-final class Tag extends Template {
-  const Tag(super.template);
+final class TagLink extends Template {
+  const TagLink(super.template);
 
   String render(Object version) =>
       template.replaceAll('%tag%', version.toString());
