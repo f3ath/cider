@@ -50,7 +50,17 @@ class Project {
       mutation = m.Sequence([mutation, m.SetPreRelease(pre)]);
     }
     final current = await getVersion();
-    final next = mutation(current);
+    Version next = mutation(current);
+    if (next <= current && pre.isNotEmpty && current.isPreRelease) {
+      // pub_semver's nextPatch/nextMinor/nextMajor strip the pre-release suffix
+      // rather than incrementing the numeric component (e.g. 0.0.16-beta →
+      // nextPatch → 0.0.16). When --pre keeps the same identifier the result
+      // equals the current version. Retry against the stripped release so the
+      // numeric component actually advances (0.0.16 → nextPatch → 0.0.17 →
+      // SetPreRelease → 0.0.17-beta).
+      final base = Version(current.major, current.minor, current.patch);
+      next = mutation(base);
+    }
     if (next <= current) {
       throw ArgumentError(
           'The next version must be higher than the current one.');

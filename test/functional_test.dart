@@ -243,6 +243,16 @@ I love my dog.
         expect(err.buffer.toString().trim(),
             'The next version must be higher than the current one.');
       });
+      test('bump patch --pre=beta from pre-release bumps patch number', () async {
+        await run(['version', '0.0.16-beta']);
+        out.buffer.clear();
+        final code = await run(['bump', 'patch', '--pre=beta']);
+        expect(code, 0);
+        expect(err.buffer.toString(), isEmpty);
+        out.buffer.clear();
+        await run(['version']);
+        expect(out.buffer.toString().trim(), '0.0.17-beta');
+      });
       test('incorrect usage', () async {
         final code = await run(['bump']);
         expect(code, 64);
